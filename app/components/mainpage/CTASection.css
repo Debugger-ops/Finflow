@@ -1,0 +1,158 @@
+/* Section spacing */
+.cta-section {
+  padding: 4rem 0;
+}
+
+@media (min-width: 768px) {
+  .cta-section {
+    padding: 6rem 0;
+  }
+}
+
+/* Container alignment */
+.cta-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Gradient border wrapper */
+.cta-gradient {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.5rem;
+  background: linear-gradient(90deg, #4f46e5, #9333ea, #f59e0b);
+  padding: 1px;
+  animation: scaleIn 0.6s ease-in-out;
+}
+
+/* Inner box with background */
+.cta-content {
+  background-color: #fff;
+  border-radius: 1.5rem;
+  padding: 2rem;
+}
+
+@media (min-width: 768px) {
+  .cta-content {
+    padding: 3rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .cta-content {
+    padding: 4rem;
+  }
+}
+
+/* Centered inner content */
+.cta-inner {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* Title styles */
+.cta-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .cta-title {
+    font-size: 2.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .cta-title {
+    font-size: 3rem;
+  }
+}
+
+/* Gradient text highlight */
+.cta-highlight {
+  background: linear-gradient(90deg, #4f46e5, #9333ea);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+/* Subtitle */
+.cta-subtext {
+  font-size: 1.125rem;
+  color: #6b7280;
+  margin-bottom: 2rem;
+}
+
+/* Buttons container */
+.cta-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+@media (min-width: 640px) {
+  .cta-buttons {
+    flex-direction: row;
+  }
+}
+
+/* Primary button */
+.cta-primary-btn {
+  background: linear-gradient(90deg, #4f46e5, #9333ea);
+  color: #fff;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.cta-primary-btn:hover {
+  opacity: 0.9;
+}
+
+.arrow-icon {
+  margin-left: 0.5rem;
+  height: 1rem;
+  width: 1rem;
+  transition: transform 0.3s ease;
+}
+
+.cta-primary-btn:hover .arrow-icon {
+  transform: translateX(4px);
+}
+
+/* Outline button */
+.cta-outline-btn {
+  border: 2px solid #4f46e5;
+  color: #4f46e5;
+  background: transparent;
+}
+
+/* Footer info */
+.cta-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.shield-icon {
+  height: 1rem;
+  width: 1rem;
+}
+
+/* Animation */
+@keyframes scaleIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

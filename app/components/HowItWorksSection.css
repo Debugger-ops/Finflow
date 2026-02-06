@@ -1,0 +1,162 @@
+#how-it-works {
+  padding: 4rem 1rem;
+}
+
+@media (min-width: 768px) {
+  #how-it-works {
+    padding: 6rem 1rem;
+  }
+}
+
+#how-it-works .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* Heading Section */
+#how-it-works .header {
+  text-align: center;
+  margin-bottom: 4rem;
+  opacity: 0;
+  animation: slideUp 0.8s ease-out forwards;
+}
+
+#how-it-works h2 {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  line-height: 1.3;
+}
+
+@media (min-width: 768px) {
+  #how-it-works h2 {
+    font-size: 2.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  #how-it-works h2 {
+    font-size: 3rem;
+  }
+}
+
+#how-it-works h2 span {
+  background: linear-gradient(to right, #4f46e5, #06b6d4);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+#how-it-works p {
+  font-size: 1.1rem;
+  color: #666;
+  max-width: 650px;
+  margin: 0 auto;
+}
+
+/* Steps Grid */
+.steps-grid {
+  display: grid;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .steps-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3rem;
+  }
+}
+
+/* Step Card */
+.step {
+  position: relative;
+  text-align: center;
+  transform: scale(0.95);
+  animation: scaleIn 0.7s forwards;
+}
+
+@media (min-width: 768px) {
+  .step::after {
+    content: "";
+    position: absolute;
+    top: 4rem;
+    left: 60%;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(to right, #4f46e5, #06b6d4);
+    opacity: 0.2;
+  }
+
+  .step:last-child::after {
+    display: none;
+  }
+}
+
+/* Step Icon */
+.step-icon {
+  width: 4rem;
+  height: 4rem;
+  margin: 0 auto 1.5rem;
+  border-radius: 1rem;
+  background: linear-gradient(to bottom right, #4f46e5, #06b6d4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-icon svg {
+  width: 2rem;
+  height: 2rem;
+  color: #fff;
+}
+
+/* Step Number */
+.step-number {
+  position: absolute;
+  top: -0.5rem;
+  right: -0.5rem;
+  width: 3rem;
+  height: 3rem;
+  background: #fff;
+  border: 2px solid rgba(79, 70, 229, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-number span {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #4f46e5;
+}
+
+/* Step Text */
+.step h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.step p {
+  color: #666;
+  font-size: 1rem;
+}
+
+/* Animations */
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  to {
+    transform: scale(1);
+  }
+}
