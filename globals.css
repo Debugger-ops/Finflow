@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 250 100% 99%;
+    --foreground: 230 15% 15%;
+    --primary: 230 60% 25%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 260 50% 35%;
+    --secondary-foreground: 0 0% 100%;
+    --border: 230 20% 90%;
+    --card: 0 0% 100%;
+    --radius: 0.75rem;
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: bold;
+    letter-spacing: -0.02em; /* optional, similar to tracking-tight */
+  }
+
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-scale-in {
+      animation: none !important;
+    }
+  }
+}
