@@ -4,30 +4,24 @@ import React, { useState, useEffect } from "react";
 import {
   ChevronRight,
   TrendingUp,
-  TrendingDown,
+  Upload,
   Plus,
   DollarSign,
   LineChart,
   PieChart,
   Activity,
   ArrowLeft,
-  Target,
   ArrowUpRight,
   ArrowDownRight,
   RefreshCw,
   Download,
-  Upload,
   Settings,
   Bell,
   Search,
-  Filter,
   MoreVertical,
-  Eye,
   Star,
-  AlertCircle,
   BarChart3,
   Globe,
-  Calendar,
   Clock,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -88,241 +82,89 @@ const Investments: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState<'all' | 'stocks' | 'crypto' | 'etfs' | 'bonds'>('all');
 
+  const myStocks: Stock[] = [
+    { symbol: 'AAPL', name: 'Apple Inc.', price: 178.42, change: 2.35, changePercent: 1.33, shares: 50, value: 8921, dayHigh: 179.85, dayLow: 176.20, volume: '52.3M' },
+    { symbol: 'MSFT', name: 'Microsoft Corp.', price: 412.78, change: 5.67, changePercent: 1.39, shares: 25, value: 10319.50, dayHigh: 415.20, dayLow: 409.50, volume: '23.1M' },
+    { symbol: 'GOOGL', name: 'Alphabet Inc.', price: 141.80, change: -1.20, changePercent: -0.84, shares: 40, value: 5672, dayHigh: 143.50, dayLow: 141.00, volume: '18.7M' },
+    { symbol: 'TSLA', name: 'Tesla Inc.', price: 248.50, change: 8.90, changePercent: 3.71, shares: 30, value: 7455, dayHigh: 252.00, dayLow: 242.30, volume: '95.2M' },
+    { symbol: 'NVDA', name: 'NVIDIA Corp.', price: 875.28, change: 12.45, changePercent: 1.44, shares: 15, value: 13129.20, dayHigh: 880.00, dayLow: 868.50, volume: '41.5M' },
+    { symbol: 'AMZN', name: 'Amazon.com Inc.', price: 178.25, change: -2.15, changePercent: -1.19, shares: 35, value: 6238.75, dayHigh: 181.00, dayLow: 177.50, volume: '35.8M' },
+  ];
+
+  const [liveStocks, setLiveStocks] = useState<Stock[]>(myStocks);
+
+  const portfolioHoldings: Portfolio[] = [
+    { name: 'US Stocks', value: 18500, change: 850, changePercent: 4.8, allocation: 57, color: 'emerald', icon: TrendingUp },
+    { name: 'Cryptocurrency', value: 8200, change: 320, changePercent: 4.1, allocation: 25, color: 'amber', icon: Globe },
+    { name: 'Bonds', value: 3750, change: 45, changePercent: 1.2, allocation: 12, color: 'blue', icon: DollarSign },
+    { name: 'ETFs', value: 2000, change: 30, changePercent: 1.5, allocation: 6, color: 'purple', icon: PieChart },
+  ];
+
+  const recentTransactions: Transaction[] = [
+    { id: 1, type: 'buy', symbol: 'AAPL', name: 'Apple Inc.', amount: -8910, shares: 50, price: 178.20, date: '2024-02-05', time: '09:30 AM' },
+    { id: 2, type: 'dividend', symbol: 'MSFT', name: 'Microsoft Corp.', amount: 125.50, date: '2024-02-04', time: '12:00 PM' },
+    { id: 3, type: 'sell', symbol: 'TSLA', name: 'Tesla Inc.', amount: 2485, shares: 10, price: 248.50, date: '2024-02-03', time: '02:15 PM' },
+    { id: 4, type: 'buy', symbol: 'NVDA', name: 'NVIDIA Corp.', amount: -4376.40, shares: 5, price: 875.28, date: '2024-02-02', time: '10:45 AM' },
+    { id: 5, type: 'dividend', symbol: 'AAPL', name: 'Apple Inc.', amount: 48.50, date: '2024-02-01', time: '12:00 PM' },
+  ];
+
+  const investmentValue = liveStocks.reduce((sum, s) => sum + (s.value ?? 0), 0);
+  const totalInvested = 28500;
+  const investmentChange = investmentValue - totalInvested;
+  const investmentChangePercent = (investmentChange / totalInvested) * 100;
+  const totalReturn = investmentChange;
+  const totalReturnPercent = investmentChangePercent;
+
+  const performanceMetrics: PerformanceMetric[] = [
+    { label: "Today's Gain", value: `$${investmentChange.toLocaleString()}`, change: `+${investmentChangePercent.toFixed(2)}%`, isPositive: true, icon: TrendingUp, color: 'emerald' },
+    { label: 'Total Return', value: `$${totalReturn.toLocaleString()}`, change: `+${totalReturnPercent.toFixed(2)}%`, isPositive: true, icon: Activity, color: 'blue' },
+    { label: 'Dividend Income', value: '$284.50', change: 'This month', icon: DollarSign, color: 'purple' },
+    { label: 'Total Invested', value: `$${totalInvested.toLocaleString()}`, icon: DollarSign, color: 'amber' },
+  ];
+
   useEffect(() => {
     setIsClient(true);
     if (status === "unauthenticated") router.push("/login");
   }, [status, router]);
 
-  if (!isClient || status === "loading") {
-    return (
-      <div className="loading-container">
-        <div className="loading-spinner"></div>
-        <p>Loading your investments...</p>
-      </div>
-    );
-  }
+  useEffect(() => {
+    const fetchLivePrices = async () => {
+      const symbols = myStocks.map(s => s.symbol).join(',');
+      const res = await fetch(`/api/prices?symbols=${symbols}`);
+const data = await res.json();
+
+      setLiveStocks(myStocks.map(stock => ({
+        ...stock,
+        price: data[stock.symbol]?.price ?? stock.price,
+        change: data[stock.symbol]?.change ?? stock.change,
+        changePercent: data[stock.symbol]?.changePercent ?? stock.changePercent,
+        value: stock.shares ? stock.shares * (data[stock.symbol]?.price ?? stock.price) : stock.value
+      })));
+    };
+
+    fetchLivePrices();
+    const interval = setInterval(fetchLivePrices, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const filteredStocks = myStocks.filter(stock =>
+    stock.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    stock.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  if (!isClient || status === "loading") return (
+    <div className="loading-container">
+      <div className="loading-spinner"></div>
+      <p>Loading your investments...</p>
+    </div>
+  );
 
   if (!session) return null;
-
-  // Sample Data
-  const investmentValue = 32450.75;
-  const investmentChange = 1245.30;
-  const investmentChangePercent = 3.99;
-  const totalInvested = 28500;
-  const totalReturn = 3950.75;
-  const totalReturnPercent = 13.86;
-
-  const portfolioHoldings: Portfolio[] = [
-    {
-      name: 'US Stocks',
-      value: 18500,
-      change: 850,
-      changePercent: 4.8,
-      allocation: 57,
-      color: 'emerald',
-      icon: TrendingUp
-    },
-    {
-      name: 'Cryptocurrency',
-      value: 8200,
-      change: 320,
-      changePercent: 4.1,
-      allocation: 25,
-      color: 'amber',
-      icon: Globe
-    },
-    {
-      name: 'Bonds',
-      value: 3750,
-      change: 45,
-      changePercent: 1.2,
-      allocation: 12,
-      color: 'blue',
-      icon: Target
-    },
-    {
-      name: 'ETFs',
-      value: 2000,
-      change: 30,
-      changePercent: 1.5,
-      allocation: 6,
-      color: 'purple',
-      icon: PieChart
-    },
-  ];
-
-  const myStocks: Stock[] = [
-    {
-      symbol: 'AAPL',
-      name: 'Apple Inc.',
-      price: 178.42,
-      change: 2.35,
-      changePercent: 1.33,
-      shares: 50,
-      value: 8921,
-      dayHigh: 179.85,
-      dayLow: 176.20,
-      volume: '52.3M'
-    },
-    {
-      symbol: 'MSFT',
-      name: 'Microsoft Corp.',
-      price: 412.78,
-      change: 5.67,
-      changePercent: 1.39,
-      shares: 25,
-      value: 10319.50,
-      dayHigh: 415.20,
-      dayLow: 409.50,
-      volume: '23.1M'
-    },
-    {
-      symbol: 'GOOGL',
-      name: 'Alphabet Inc.',
-      price: 141.80,
-      change: -1.20,
-      changePercent: -0.84,
-      shares: 40,
-      value: 5672,
-      dayHigh: 143.50,
-      dayLow: 141.00,
-      volume: '18.7M'
-    },
-    {
-      symbol: 'TSLA',
-      name: 'Tesla Inc.',
-      price: 248.50,
-      change: 8.90,
-      changePercent: 3.71,
-      shares: 30,
-      value: 7455,
-      dayHigh: 252.00,
-      dayLow: 242.30,
-      volume: '95.2M'
-    },
-    {
-      symbol: 'NVDA',
-      name: 'NVIDIA Corp.',
-      price: 875.28,
-      change: 12.45,
-      changePercent: 1.44,
-      shares: 15,
-      value: 13129.20,
-      dayHigh: 880.00,
-      dayLow: 868.50,
-      volume: '41.5M'
-    },
-    {
-      symbol: 'AMZN',
-      name: 'Amazon.com Inc.',
-      price: 178.25,
-      change: -2.15,
-      changePercent: -1.19,
-      shares: 35,
-      value: 6238.75,
-      dayHigh: 181.00,
-      dayLow: 177.50,
-      volume: '35.8M'
-    },
-  ];
-
-  const recentTransactions: Transaction[] = [
-    {
-      id: 1,
-      type: 'buy',
-      symbol: 'AAPL',
-      name: 'Apple Inc.',
-      amount: -8910,
-      shares: 50,
-      price: 178.20,
-      date: '2024-02-05',
-      time: '09:30 AM'
-    },
-    {
-      id: 2,
-      type: 'dividend',
-      symbol: 'MSFT',
-      name: 'Microsoft Corp.',
-      amount: 125.50,
-      date: '2024-02-04',
-      time: '12:00 PM'
-    },
-    {
-      id: 3,
-      type: 'sell',
-      symbol: 'TSLA',
-      name: 'Tesla Inc.',
-      amount: 2485,
-      shares: 10,
-      price: 248.50,
-      date: '2024-02-03',
-      time: '02:15 PM'
-    },
-    {
-      id: 4,
-      type: 'buy',
-      symbol: 'NVDA',
-      name: 'NVIDIA Corp.',
-      amount: -4376.40,
-      shares: 5,
-      price: 875.28,
-      date: '2024-02-02',
-      time: '10:45 AM'
-    },
-    {
-      id: 5,
-      type: 'dividend',
-      symbol: 'AAPL',
-      name: 'Apple Inc.',
-      amount: 48.50,
-      date: '2024-02-01',
-      time: '12:00 PM'
-    },
-  ];
-
-  const performanceMetrics: PerformanceMetric[] = [
-    {
-      label: "Today's Gain",
-      value: `$${investmentChange.toLocaleString()}`,
-      change: `+${investmentChangePercent}%`,
-      isPositive: true,
-      icon: TrendingUp,
-      color: 'emerald'
-    },
-    {
-      label: 'Total Return',
-      value: `$${totalReturn.toLocaleString()}`,
-      change: `+${totalReturnPercent}%`,
-      isPositive: true,
-      icon: Activity,
-      color: 'blue'
-    },
-    {
-      label: 'Dividend Income',
-      value: '$284.50',
-      change: 'This month',
-      icon: DollarSign,
-      color: 'purple'
-    },
-    {
-      label: 'Total Invested',
-      value: `$${totalInvested.toLocaleString()}`,
-      icon: Target,
-      color: 'amber'
-    },
-  ];
 
   const handleRefresh = () => {
     setIsRefreshing(true);
     setTimeout(() => setIsRefreshing(false), 1500);
   };
-
-  const filteredStocks = myStocks.filter(stock => {
-    const matchesSearch = stock.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         stock.name.toLowerCase().includes(searchQuery.toLowerCase());
-    // Add filter logic based on filterType if needed
-    return matchesSearch;
-  });
 
   return (
     <div className="investments-page">
@@ -405,13 +247,14 @@ const Investments: React.FC = () => {
           </div>
           <div className="summary-actions">
             <button className="action-btn primary" onClick={() => router.push('/buy-stocks')}>
-              <Plus size={18} />
-              Buy Assets
-            </button>
-            <button className="action-btn secondary" onClick={() => router.push('/sell-stocks')}>
-              <Upload size={18} />
-              Sell
-            </button>
+  <Plus size={18} />
+  Buy Assets
+</button>
+<button className="action-btn secondary" onClick={() => router.push('/sell-stocks')}>
+  <Upload size={18} />
+  Sell
+</button>
+
           </div>
         </div>
 
