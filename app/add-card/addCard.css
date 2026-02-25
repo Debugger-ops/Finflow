@@ -1,0 +1,432 @@
+/* ========================================
+   Add Card — Dark Theme
+   Deep navy + emerald accent
+======================================== */
+
+/* ========================================
+   Container & Layout
+======================================== */
+.add-card-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0d0f1a 0%, #30164f 100%);
+  padding: 2rem;
+  position: relative;
+}
+
+.add-card-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 280px;
+  background: linear-gradient(135deg, #5418a2 0%, #0a2e22 100%);
+  border-radius: 0 0 50% 50% / 0 0 4rem 4rem;
+  z-index: 0;
+}
+
+/* ========================================
+   Header
+======================================== */
+.add-card-header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  animation: slideDown 0.5s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.back-button {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 0.75rem;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.back-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateX(-4px);
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+/* ========================================
+   Success Message
+======================================== */
+.success-message {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(52, 211, 153, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  color: #34d399;
+  padding: 1rem 1.5rem;
+  border-radius: 14px;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  animation: fadeInUp 0.4s ease-out;
+  max-width: 560px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ========================================
+   Content Wrapper
+======================================== */
+.add-card-content {
+  position: relative;
+  z-index: 1;
+  max-width: 560px;
+  margin: 0 auto;
+  animation: fadeInUp 0.6s ease-out 0.1s backwards;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ========================================
+   Card Preview
+======================================== */
+.card-preview {
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.credit-card {
+  width: 100%;
+  max-width: 400px;
+  height: 220px;
+  border-radius: 20px;
+  padding: 1.75rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #54219b 0%, #0f1f18 100%);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+  transition: all 0.4s ease;
+}
+
+/* Glare overlay */
+.credit-card::before {
+  content: "";
+  position: absolute;
+  top: -40%;
+  left: -40%;
+  width: 80%;
+  height: 80%;
+  background: radial-gradient(ellipse, rgba(52, 211, 153, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.credit-card.visa {
+  background: linear-gradient(135deg, #1a2040 0%, #0d1530 100%);
+  border-color: rgba(99, 149, 255, 0.25);
+}
+
+.credit-card.mastercard {
+  background: linear-gradient(135deg, #2a1a10 0%, #1a0f08 100%);
+  border-color: rgba(255, 150, 80, 0.25);
+}
+
+.credit-card.amex {
+  background: linear-gradient(135deg, #1a2530 0%, #0d1820 100%);
+  border-color: rgba(80, 190, 230, 0.25);
+}
+
+.card-chip {
+  width: 44px;
+  height: 34px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #c9a84c 0%, #f0d070 50%, #c9a84c 100%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.card-chip::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.2);
+  transform: translateY(-50%);
+}
+
+.card-number {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 0.18em;
+  font-family: 'Courier New', monospace;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.card-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.card-holder,
+.card-expiry {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.card-label {
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.45);
+  font-weight: 500;
+}
+
+.card-value {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 0.06em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.card-brand {
+  position: absolute;
+  top: 1.75rem;
+  right: 1.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ========================================
+   Form
+======================================== */
+.add-card-form {
+  background: #1a1d30;
+  border-radius: 24px;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #9ca3af;
+  letter-spacing: 0.02em;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  font-size: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  background: #13152a;
+  color: #e2e8f0;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.form-group input::placeholder {
+  color: #374151;
+}
+
+.form-group input:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: #181b30;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #7e27c4;
+  background: #181b30;
+  box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.1);
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 1rem;
+  color: #4b5563;
+  pointer-events: none;
+  z-index: 1;
+  transition: color 0.3s ease;
+}
+
+.input-wrapper input {
+  padding-left: 3rem;
+}
+
+.input-wrapper:focus-within .input-icon {
+  color: #8324b3;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+/* ========================================
+   Security Note
+======================================== */
+.security-note {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  color: #6b7280;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  padding: 0.75rem 1rem;
+  background: rgba(52, 211, 153, 0.05);
+  border: 1px solid rgba(52, 211, 153, 0.1);
+  border-radius: 10px;
+}
+
+.security-note svg {
+  color: #5930a5;
+  flex-shrink: 0;
+}
+
+/* ========================================
+   Submit Button
+======================================== */
+.submit-button {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  border: none;
+  border-radius: 14px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  transition: all 0.3s ease;
+  letter-spacing: 0.02em;
+}
+
+.submit-button-emerald {
+  background: linear-gradient(135deg, #2f208a 0%, #6e1892 100%);
+  color: white;
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);
+}
+
+.submit-button-emerald:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.5);
+  background: linear-gradient(135deg, #9225b0 0%, #7817af 100%);
+}
+
+.submit-button-emerald:active {
+  transform: translateY(0);
+}
+
+/* ========================================
+   Accessibility
+======================================== */
+.back-button:focus-visible,
+.submit-button:focus-visible,
+.form-group input:focus-visible {
+  outline: 3px solid #6634d3;
+  outline-offset: 2px;
+}
+
+/* ========================================
+   Responsive
+======================================== */
+@media (max-width: 600px) {
+  .add-card-container {
+    padding: 1.25rem 1rem;
+  }
+
+  .add-card-container::before {
+    height: 200px;
+    border-radius: 0 0 40% 40% / 0 0 3rem 3rem;
+  }
+
+  .page-title {
+    font-size: 1.625rem;
+  }
+
+  .credit-card {
+    height: 190px;
+    padding: 1.25rem;
+  }
+
+  .card-number {
+    font-size: 1.05rem;
+  }
+
+  .add-card-form {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ========================================
+   Reduced Motion
+======================================== */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
