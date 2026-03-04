@@ -1,6 +1,11 @@
 /* ========================================
    Login Container & Layout
 ======================================== */
+*{
+  margin: 0;
+  padding: 0;
+}
+
 .login-container {
   min-height: 100vh;
   display: flex;
@@ -610,4 +615,5 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+
 }
