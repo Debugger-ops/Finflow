@@ -485,6 +485,7 @@
 .divider-text {
   padding: 0 14px;
   font-size: 0.78rem;
+  background-color: #080c14;
   color: var(--text-muted);
   letter-spacing: 0.04em;
   text-transform: uppercase;
