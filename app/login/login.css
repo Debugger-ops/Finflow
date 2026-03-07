@@ -1,619 +1,565 @@
-/* ========================================
-   Login Container & Layout
-======================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@400;500;700;800;900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ============================================================
+   DESIGN TOKENS  (mirrors page.css / register.css)
+   ============================================================ */
 *{
-  margin: 0;
-  padding: 0;
+  box-sizing: border-box;
+  margin    : 0;
+  padding   : 0;
 }
 
+   :root {
+  --ink-950  : #020408;
+  --ink-900  : #060b14;
+  --ink-800  : #0b1221;
+  --ink-700  : #101a2e;
+  --ink-600  : #16243f;
+  --ink-400  : #2a3f5f;
+  --ink-200  : #3d5a80;
+
+  --slate-500: #4a6280;
+  --slate-400: #647d9e;
+  --slate-300: #8fa3be;
+  --slate-200: #b8c8da;
+  --slate-100: #dce6f0;
+  --white    : #f0f6ff;
+
+  --cyan-400 : #00d4ff;
+  --cyan-300 : #38e5ff;
+  --gold-400 : #f5c842;
+  --gold-300 : #fbd96a;
+  --green-400: #00e5a0;
+  --red-400  : #ff4d6a;
+
+  --ff-display: 'Cabinet Grotesk', sans-serif;
+  --ff-serif  : 'Instrument Serif', serif;
+  --ff-mono   : 'JetBrains Mono', monospace;
+
+  --grad-primary  : linear-gradient(135deg, var(--cyan-400) 0%, #3b82f6 50%, #8b5cf6 100%);
+  --grad-gold     : linear-gradient(135deg, var(--gold-400), var(--gold-300));
+  --grad-hero-glow: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(0,212,255,0.14) 0%, transparent 65%);
+
+  --border-dim   : rgba(255 255 255 / .055);
+  --border-subtle: rgba(255 255 255 / .09);
+  --border-cyan  : rgba(0, 212, 255, 0.22);
+
+  --r-xs: 4px;
+  --r-sm: 8px;
+  --r-md: 14px;
+  --r-lg: 22px;
+
+  --ease  : cubic-bezier(0.4, 0, 0.2, 1);
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ============================================================
+   SCOPED RESET
+   ============================================================ */
+:where(.login-container) *,
+:where(.login-container) *::before,
+:where(.login-container) *::after {
+  box-sizing: border-box;
+  margin    : 0;
+  padding   : 0;
+}
+
+/* ============================================================
+   ROOT — full-viewport centred layout
+   ============================================================ */
 .login-container {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  min-height  : 100vh;
+  width       : 100%;
+  font-family : var(--ff-display);
+  background  : var(--ink-950);
+  color       : var(--white);
+  isolation   : isolate;
+  contain     : layout style;
+  overflow-x  : hidden;
+
+  display        : flex;
+  flex-direction : column;
+  align-items    : center;
   justify-content: center;
-  padding: 2rem 1rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  position: relative;
-  overflow: hidden;
+  padding        : 40px 24px;
+  gap            : 24px;
+
+  /* Same dot-grid as page.css */
+  background-image:
+    radial-gradient(circle, rgba(255 255 255 / .045) 1px, transparent 1px);
+  background-size: 28px 28px;
 }
 
+/* CSS grain overlay */
 .login-container::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: 
-    radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+  content : '';
+  position: fixed;
+  inset   : 0;
+  z-index : 0;
+  pointer-events: none;
+  opacity : .028;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+}
+
+/* Hero glow behind card */
+.login-container::after {
+  content      : '';
+  position     : fixed;
+  top          : 0; left: 50%;
+  translate    : -50% 0;
+  width        : 700px;
+  height       : 500px;
+  background   : var(--grad-hero-glow);
+  pointer-events: none;
+  z-index      : 0;
+}
+
+/* ============================================================
+   CARD
+   ============================================================ */
+.login-card {
+  position     : relative;
+  z-index      : 1;
+  width        : 100%;
+  max-width    : 440px;
+  background   : var(--ink-800);
+  border       : 1px solid var(--border-subtle);
+  border-radius: var(--r-lg);
+  padding      : 44px 40px;
+  overflow     : hidden;
+}
+
+/* Top cyan accent line */
+.login-card::before {
+  content  : '';
+  position : absolute;
+  top      : 0; left: 0; right: 0;
+  height   : 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--cyan-400) 40%, #8b5cf6 60%, transparent 100%);
+  opacity  : .5;
+}
+
+/* Conic corner glow */
+.login-card::after {
+  content  : '';
+  position : absolute;
+  top      : 0; right: 0;
+  width    : 120px; height: 120px;
+  background: conic-gradient(from 180deg at 100% 0%, rgba(0,212,255,.12), transparent 40%);
   pointer-events: none;
 }
 
-/* ========================================
-   Login Card
-======================================== */
-.login-card {
-  background: white;
-  border-radius: 24px;
-  padding: 3rem 2.5rem;
-  width: 100%;
-  max-width: 480px;
-  box-shadow: 
-    0 20px 60px rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-  animation: slideUp 0.6s ease-out;
-  position: relative;
-  z-index: 1;
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ========================================
-   Header Section
-======================================== */
+/* ============================================================
+   HEADER
+   ============================================================ */
 .login-header {
-  text-align: center;
-  margin-bottom: 2.5rem;
+  text-align   : center;
+  margin-bottom: 36px;
 }
 
 .login-logo {
-  width: 72px;
-  height: 72px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 20px;
-  display: flex;
-  align-items: center;
+  width          : 56px;
+  height         : 56px;
+  border-radius  : var(--r-md);
+  background     : var(--grad-primary);
+  display        : flex;
+  align-items    : center;
   justify-content: center;
-  margin: 0 auto 1.5rem;
-  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
-  animation: float 3s ease-in-out infinite;
+  color          : #fff;
+  margin         : 0 auto 20px;
+  box-shadow     : 0 0 28px rgba(0, 212, 255, 0.28);
+  position       : relative;
 }
 
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-8px);
-  }
-}
-
-.login-logo svg {
-  color: white;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+/* Inner shine */
+.login-logo::after {
+  content  : '';
+  position : absolute;
+  inset    : 0;
+  border-radius: var(--r-md);
+  background: linear-gradient(to bottom, rgba(255 255 255 / .14), transparent);
+  pointer-events: none;
 }
 
 .login-title {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1a202c;
-  margin: 0 0 0.5rem;
-  letter-spacing: -0.02em;
+  font-size     : 1.75rem;
+  font-weight   : 900;
+  letter-spacing: -.04em;
+  color         : var(--white);
+  margin-bottom : 8px;
 }
 
 .login-subtitle {
-  font-size: 1rem;
-  color: #718096;
-  margin: 0;
+  font-size  : .875rem;
+  color      : var(--slate-400);
   font-weight: 400;
+  line-height: 1.5;
 }
 
-/* ========================================
-   Error Message
-======================================== */
+/* ============================================================
+   ERROR MESSAGE
+   ============================================================ */
 .error-message {
-  background: #fee;
-  border: 1px solid #fcc;
-  color: #c33;
-  padding: 0.875rem 1rem;
-  border-radius: 12px;
-  margin-bottom: 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  font-size: 0.875rem;
-  animation: shake 0.4s ease-in-out;
+  display      : flex;
+  align-items  : center;
+  gap          : 10px;
+  padding      : 12px 16px;
+  background   : rgba(255, 77, 106, 0.08);
+  border       : 1px solid rgba(255, 77, 106, 0.25);
+  border-radius: var(--r-sm);
+  color        : var(--red-400);
+  font-size    : .85rem;
+  font-weight  : 500;
+  margin-bottom: 20px;
 }
 
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-8px); }
-  75% { transform: translateX(8px); }
-}
+.error-message svg { flex-shrink: 0; }
 
-.error-message svg {
-  flex-shrink: 0;
-}
-
-/* ========================================
-   Form Groups
-======================================== */
+/* ============================================================
+   FORM GROUPS
+   ============================================================ */
 .form-group {
-  margin-bottom: 1.5rem;
+  display      : flex;
+  flex-direction: column;
+  gap          : 7px;
+  margin-bottom: 18px;
 }
 
 .form-label {
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #2d3748;
-  margin-bottom: 0.5rem;
-  letter-spacing: 0.01em;
+  font-family   : var(--ff-mono);
+  font-size     : .68rem;
+  font-weight   : 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color         : var(--slate-300);
 }
 
-/* ========================================
-   Input Wrapper & Styles
-======================================== */
+/* ---- Input wrapper ---- */
 .input-wrapper {
   position: relative;
-  display: flex;
+  display : flex;
   align-items: center;
 }
 
 .input-icon {
-  position: absolute;
-  left: 1rem;
-  color: #a0aec0;
-  display: flex;
-  align-items: center;
+  position      : absolute;
+  left          : 14px;
+  display       : flex;
+  align-items   : center;
+  color         : var(--slate-500);
   pointer-events: none;
-  transition: color 0.2s ease;
-  z-index: 1;
+  transition    : color 160ms var(--ease);
 }
 
 .form-input {
-  width: 100%;
-  padding: 0.875rem 1rem 0.875rem 3rem;
-  font-size: 1rem;
-  border: 2px solid #e2e8f0;
-  border-radius: 12px;
-  background: #f7fafc;
-  color: #2d3748;
-  transition: all 0.2s ease;
-  font-family: inherit;
+  width        : 100%;
+  padding      : 12px 14px 12px 44px;
+  background   : var(--ink-700);
+  border       : 1px solid var(--border-dim);
+  border-radius: var(--r-sm);
+  color        : var(--white);
+  font-family  : var(--ff-display);
+  font-size    : .9rem;
+  font-weight  : 400;
+  outline      : none;
+  transition   : border-color 160ms var(--ease),
+                 background 160ms var(--ease),
+                 box-shadow 160ms var(--ease);
 }
 
-.form-input::placeholder {
-  color: #a0aec0;
-}
-
-.form-input:hover {
-  border-color: #cbd5e0;
-  background: #fff;
-}
+.form-input::placeholder { color: var(--slate-500); }
 
 .form-input:focus {
-  outline: none;
-  border-color: #667eea;
-  background: #fff;
-  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+  border-color: var(--border-cyan);
+  background  : var(--ink-600);
+  box-shadow  : 0 0 0 3px rgba(0, 212, 255, 0.08);
 }
 
-.form-input:focus + .password-toggle,
-.form-input:focus ~ .input-icon {
-  color: #667eea;
+.form-input:focus ~ .input-icon,
+.input-wrapper:focus-within .input-icon {
+  color: var(--cyan-400);
 }
 
 .form-input:disabled {
-  background: #edf2f7;
-  cursor: not-allowed;
-  opacity: 0.6;
+  opacity: .5;
+  cursor : not-allowed;
 }
 
-.password-input {
-  padding-right: 3.5rem;
-}
+/* password has right padding for toggle */
+.password-input { padding-right: 44px; }
 
-/* ========================================
-   Password Toggle
-======================================== */
+/* ---- Password toggle ---- */
 .password-toggle {
-  position: absolute;
-  right: 1rem;
-  background: none;
-  border: none;
-  color: #a0aec0;
-  cursor: pointer;
-  padding: 0.5rem;
-  display: flex;
+  position  : absolute;
+  right     : 12px;
+  display   : flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
-  border-radius: 8px;
+  background: none;
+  border    : none;
+  cursor    : pointer;
+  padding   : 4px;
+  color     : var(--slate-500);
+  transition: color 160ms var(--ease);
 }
 
-.password-toggle:hover {
-  color: #667eea;
-  background: rgba(102, 126, 234, 0.1);
-}
+.password-toggle:hover   { color: var(--slate-200); }
+.password-toggle:disabled { opacity: .4; cursor: not-allowed; }
 
-.password-toggle:active {
-  transform: scale(0.95);
-}
-
-.password-toggle:disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-
-/* ========================================
-   Remember Me & Forgot Password
-======================================== */
+/* ============================================================
+   REMEMBER ME / FORGOT ROW
+   ============================================================ */
 .remember-forgot {
-  display: flex;
-  align-items: center;
+  display        : flex;
+  align-items    : center;
   justify-content: space-between;
-  margin-bottom: 1.75rem;
-  gap: 1rem;
+  margin-bottom  : 24px;
+  gap            : 8px;
 }
 
 .remember-me {
-  display: flex;
+  display    : flex;
   align-items: center;
-  gap: 0.5rem;
+  gap        : 8px;
 }
 
+/* Hide native checkbox */
 .checkbox {
-  width: 18px;
-  height: 18px;
-  border: 2px solid #cbd5e0;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  accent-color: #667eea;
-}
-
-.checkbox:hover {
-  border-color: #667eea;
+  appearance: none;
+  -webkit-appearance: none;
+  width        : 17px;
+  height       : 17px;
+  border       : 1.5px solid var(--border-subtle);
+  border-radius: 4px;
+  background   : var(--ink-700);
+  cursor       : pointer;
+  position     : relative;
+  flex-shrink  : 0;
+  transition   : border-color 160ms var(--ease), background 160ms var(--ease);
 }
 
 .checkbox:checked {
-  background: #667eea;
-  border-color: #667eea;
+  background   : var(--grad-primary);
+  border-color : var(--cyan-400);
 }
 
-.checkbox:disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
+/* Checkmark via clip-path */
+.checkbox:checked::after {
+  content    : '';
+  position   : absolute;
+  top        : 2px; left: 4px;
+  width      : 6px; height: 10px;
+  border     : 2px solid #fff;
+  border-top : none;
+  border-left: none;
+  transform  : rotate(45deg);
 }
+
+.checkbox:disabled { opacity: .45; cursor: not-allowed; }
 
 .checkbox-label {
-  font-size: 0.875rem;
-  color: #4a5568;
-  cursor: pointer;
+  font-size  : .85rem;
+  color      : var(--slate-400);
+  cursor     : pointer;
   user-select: none;
 }
 
 .forgot-link {
-  font-size: 0.875rem;
-  color: #667eea;
+  font-family   : var(--ff-mono);
+  font-size     : .72rem;
+  font-weight   : 500;
+  letter-spacing: .04em;
+  color         : var(--cyan-400);
   text-decoration: none;
-  font-weight: 600;
-  transition: color 0.2s ease;
-  white-space: nowrap;
+  transition    : color 160ms var(--ease);
 }
+.forgot-link:hover { color: var(--cyan-300); }
 
-.forgot-link:hover {
-  color: #764ba2;
-  text-decoration: underline;
-}
-
-/* ========================================
-   Submit Button
-======================================== */
+/* ============================================================
+   SUBMIT BUTTON
+   ============================================================ */
 .submit-btn {
-  width: 100%;
-  padding: 0.975rem 1.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
+  display        : flex;
+  align-items    : center;
   justify-content: center;
-  gap: 0.5rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-  position: relative;
-  overflow: hidden;
+  gap            : 9px;
+  width          : 100%;
+  padding        : 14px 24px;
+  background     : var(--grad-primary);
+  color          : #fff;
+  border         : none;
+  border-radius  : var(--r-sm);
+  font-family    : var(--ff-display);
+  font-size      : .95rem;
+  font-weight    : 800;
+  letter-spacing : .01em;
+  cursor         : pointer;
+  position       : relative;
+  overflow       : hidden;
+  transition     : transform 200ms var(--spring),
+                   box-shadow 200ms var(--ease),
+                   opacity 160ms var(--ease);
+  box-shadow     : 0 1px 0 rgba(255 255 255 / .14) inset,
+                   0 4px 28px rgba(0, 212, 255, 0.26);
 }
 
-.submit-btn::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s ease;
+/* Inner top-shine */
+.submit-btn::after {
+  content   : '';
+  position  : absolute;
+  inset     : 0;
+  background: linear-gradient(to bottom, rgba(255 255 255 / .1), transparent);
+  pointer-events: none;
 }
 
-.submit-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+.submit-btn:hover:not(:disabled) {
+  transform : translateY(-2px);
+  box-shadow: 0 1px 0 rgba(255 255 255 / .14) inset,
+              0 8px 40px rgba(0, 212, 255, 0.4);
 }
 
-.submit-btn:hover::before {
-  left: 100%;
-}
-
-.submit-btn:active {
-  transform: translateY(0);
-}
+.submit-btn:active:not(:disabled) { transform: translateY(1px); }
 
 .submit-btn:disabled {
-  background: #cbd5e0;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-  opacity: 0.7;
+  opacity: .45;
+  cursor : not-allowed;
 }
 
-.submit-btn:disabled:hover {
-  transform: none;
-}
-
+/* Spinner animation */
 .spinner {
-  animation: spin 1s linear infinite;
+  animation: spin 0.8s linear infinite;
 }
 
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 
-/* ========================================
-   Divider
-======================================== */
+/* ============================================================
+   DIVIDER
+   ============================================================ */
 .divider {
-  position: relative;
-  text-align: center;
-  margin: 2rem 0 1.5rem;
+  display    : flex;
+  align-items: center;
+  margin     : 24px 0 20px;
+  gap        : 14px;
 }
 
-.divider::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: #e2e8f0;
+.divider::before,
+.divider::after {
+  content   : '';
+  flex      : 1;
+  height    : 1px;
+  background: var(--border-dim);
 }
 
 .divider-text {
-  position: relative;
-  display: inline-block;
-  padding: 0 1rem;
-  background: white;
-  font-size: 0.875rem;
-  color: #718096;
-  font-weight: 500;
+  font-family   : var(--ff-mono);
+  font-size     : .65rem;
+  font-weight   : 500;
+  color         : var(--slate-500);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  white-space   : nowrap;
 }
 
-/* ========================================
-   Social Login Button
-======================================== */
+/* ============================================================
+   SOCIAL BUTTON — GitHub
+   ============================================================ */
 .social-btn {
-  width: 100%;
-  padding: 0.875rem 1.5rem;
-  background: white;
-  border: 2px solid #e2e8f0;
-  border-radius: 12px;
-  font-size: 0.975rem;
-  font-weight: 600;
-  color: #2d3748;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
+  display        : flex;
+  align-items    : center;
   justify-content: center;
-  gap: 0.75rem;
-  transition: all 0.2s ease;
-  margin-bottom: 1.5rem;
+  gap            : 10px;
+  width          : 100%;
+  padding        : 12px 24px;
+  background     : var(--ink-700);
+  border         : 1px solid var(--border-subtle);
+  border-radius  : var(--r-sm);
+  color          : var(--slate-200);
+  font-family    : var(--ff-display);
+  font-size      : .9rem;
+  font-weight    : 600;
+  cursor         : pointer;
+  transition     : border-color 160ms var(--ease),
+                   background 160ms var(--ease),
+                   color 160ms var(--ease),
+                   transform 200ms var(--spring);
+  box-shadow     : 0 1px 0 rgba(255 255 255 / .05) inset;
 }
 
-.social-btn:hover {
-  border-color: #cbd5e0;
-  background: #f7fafc;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-.social-btn:active {
-  transform: translateY(0);
+.social-btn:hover:not(:disabled) {
+  background  : var(--ink-600);
+  border-color: rgba(255 255 255 / .16);
+  color       : var(--white);
+  transform   : translateY(-1px);
 }
 
 .social-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+  opacity: .45;
+  cursor : not-allowed;
 }
 
-/* ========================================
-   Sign Up Section
-======================================== */
+/* ============================================================
+   SIGN-UP LINK
+   ============================================================ */
 .signup-section {
   text-align: center;
+  margin-top: 24px;
 }
 
 .signup-text {
-  font-size: 0.925rem;
-  color: #4a5568;
-  margin: 0;
+  font-size: .875rem;
+  color    : var(--slate-400);
 }
 
 .signup-link {
-  color: #667eea;
+  color          : var(--cyan-400);
+  font-weight    : 700;
   text-decoration: none;
-  font-weight: 600;
-  transition: color 0.2s ease;
+  margin-left    : 4px;
+  transition     : color 160ms var(--ease);
 }
+.signup-link:hover { color: var(--cyan-300); }
 
-.signup-link:hover {
-  color: #764ba2;
-  text-decoration: underline;
-}
-
-/* ========================================
-   Footer
-======================================== */
+/* ============================================================
+   FOOTER TEXT (below card)
+   ============================================================ */
 .footer-text {
-  margin-top: 2rem;
-  text-align: center;
   position: relative;
-  z-index: 1;
+  z-index : 1;
 }
 
 .footer-links {
-  font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.9);
-  margin: 0;
+  font-size  : .75rem;
+  color      : var(--slate-500);
+  text-align : center;
   line-height: 1.6;
 }
 
 .footer-links a {
-  color: white;
-  text-decoration: underline;
-  font-weight: 500;
-  transition: opacity 0.2s ease;
+  color          : var(--slate-400);
+  text-decoration: none;
+  transition     : color 160ms var(--ease);
 }
+.footer-links a:hover { color: var(--slate-100); }
 
-.footer-links a:hover {
-  opacity: 0.8;
-}
-
-/* ========================================
-   Responsive Design
-======================================== */
-@media (max-width: 640px) {
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 480px) {
   .login-card {
-    padding: 2rem 1.5rem;
-    border-radius: 20px;
+    padding      : 32px 24px;
+    border-radius: var(--r-md);
   }
 
-  .login-title {
-    font-size: 1.75rem;
-  }
-
-  .login-subtitle {
-    font-size: 0.925rem;
-  }
-
-  .login-logo {
-    width: 64px;
-    height: 64px;
-    border-radius: 16px;
-  }
+  .login-title { font-size: 1.5rem; }
 
   .remember-forgot {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
+    align-items   : flex-start;
+    gap           : 12px;
   }
-
-  .footer-links {
-    font-size: 0.75rem;
-  }
-}
-
-@media (max-width: 400px) {
-  .login-container {
-    padding: 1rem 0.75rem;
-  }
-
-  .login-card {
-    padding: 1.75rem 1.25rem;
-  }
-
-  .form-input {
-    font-size: 0.925rem;
-  }
-}
-
-/* ========================================
-   Dark Mode Support (Optional)
-======================================== */
-@media (prefers-color-scheme: dark) {
-  /* Uncomment to enable dark mode */
-  /*
-  .login-card {
-    background: #1a202c;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
-  }
-
-  .login-title {
-    color: #f7fafc;
-  }
-
-  .login-subtitle,
-  .signup-text,
-  .checkbox-label {
-    color: #cbd5e0;
-  }
-
-  .form-label {
-    color: #e2e8f0;
-  }
-
-  .form-input {
-    background: #2d3748;
-    border-color: #4a5568;
-    color: #f7fafc;
-  }
-
-  .form-input:hover {
-    border-color: #718096;
-    background: #374151;
-  }
-
-  .divider::before {
-    background: #4a5568;
-  }
-
-  .divider-text {
-    background: #1a202c;
-  }
-
-  .social-btn {
-    background: #2d3748;
-    border-color: #4a5568;
-    color: #f7fafc;
-  }
-  */
-}
-
-/* ========================================
-   Accessibility
-======================================== */
-.form-input:focus-visible,
-.submit-btn:focus-visible,
-.social-btn:focus-visible,
-.password-toggle:focus-visible,
-.checkbox:focus-visible {
-  outline: 3px solid #667eea;
-  outline-offset: 2px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-
 }
