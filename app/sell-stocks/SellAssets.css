@@ -1,586 +1,852 @@
+/* =============================================
+   IMPORTS
+   ============================================= */
+@import url('https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Cabinet+Grotesk:wght@300;400;500;600;700;800&display=swap');
+
+/* =============================================
+   DESIGN TOKENS
+   ============================================= */
+:root {
+  --bg-base:        #03050f;
+  --bg-surface:     #080d1c;
+  --bg-card:        #0c1225;
+  --bg-card-alt:    #101830;
+  --bg-hover:       #151f38;
+
+  --text-primary:   #e8eeff;
+  --text-secondary: #7d8ab5;
+  --text-muted:     #3e4a6b;
+
+  --brand:          #4f7cff;
+  --brand-light:    #7ba3ff;
+  --brand-dim:      rgba(79,124,255,0.12);
+  --brand-border:   rgba(79,124,255,0.25);
+  --brand-glow:     0 0 40px rgba(79,124,255,0.18);
+
+  --accent-cyan:    #22d3ee;
+  --accent-violet:  #a78bfa;
+
+  /* Sell accent — warm amber/orange tones */
+  --sell:           #f97316;
+  --sell-light:     #fb923c;
+  --sell-dim:       rgba(249,115,22,0.12);
+  --sell-border:    rgba(249,115,22,0.28);
+  --sell-glow:      0 0 40px rgba(249,115,22,0.15);
+
+  --positive:        #34d399;
+  --positive-bg:     rgba(52,211,153,0.1);
+  --positive-border: rgba(52,211,153,0.22);
+  --negative:        #fb7185;
+  --negative-bg:     rgba(251,113,133,0.1);
+  --negative-border: rgba(251,113,133,0.22);
+  --warning:         #fbbf24;
+  --warning-bg:      rgba(251,191,36,0.1);
+
+  --border:        rgba(255,255,255,0.06);
+  --border-bright: rgba(255,255,255,0.12);
+
+  --r-sm:  0.5rem;
+  --r-md:  0.875rem;
+  --r-lg:  1.25rem;
+  --r-xl:  1.75rem;
+  --r-2xl: 2.5rem;
+
+  --s-sm: 0.5rem;
+  --s-md: 1rem;
+  --s-lg: 1.5rem;
+  --s-xl: 2rem;
+  --s-2xl:3rem;
+
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.55);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.65);
+  --shadow-xl: 0 20px 60px rgba(0,0,0,0.7);
+
+  --t-fast:   120ms cubic-bezier(.4,0,.2,1);
+  --t-base:   200ms cubic-bezier(.4,0,.2,1);
+  --t-spring: 420ms cubic-bezier(.34,1.56,.64,1);
+
+  --font-display: 'Clash Display', sans-serif;
+  --font-body:    'Cabinet Grotesk', sans-serif;
+}
+
+/* =============================================
+   RESET & BASE
+   ============================================= */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-image:
+    radial-gradient(ellipse 70% 50% at 20% -10%, rgba(249,115,22,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 80% 95%, rgba(167,139,250,0.04) 0%, transparent 60%);
+}
+
+button { border: none; background: none; cursor: pointer; font-family: var(--font-body); }
+button:focus-visible { outline: 2px solid var(--sell); outline-offset: 2px; }
+input  { font-family: var(--font-body); border: none; outline: none; background: none; }
+
+::-webkit-scrollbar       { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--bg-base); }
+::-webkit-scrollbar-thumb { background: var(--bg-hover); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--sell); }
+
+@keyframes fade-in  { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slide-up { from { opacity: 0; transform: translateY(24px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes card-in  { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+
+/* =============================================
+   PAGE WRAPPER
+   ============================================= */
 .sell-assets-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
-  background: #f8f9fa;
+  padding: var(--s-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-xl);
   min-height: 100vh;
+  animation: fade-in 0.35s ease;
 }
 
+/* =============================================
+   HEADER
+   ============================================= */
 .sell-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 30px;
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  gap: var(--s-md);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: var(--s-lg) var(--s-xl);
+  position: relative;
+  overflow: hidden;
+}
+
+.sell-header::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--sell), var(--accent-violet), var(--accent-cyan));
 }
 
 .sell-header h1 {
-  font-size: 24px;
-  font-weight: 700;
-  color: #1a1a1a;
-  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.5rem; font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.03em;
 }
 
 .back-btn {
-  background: #f0f0f0;
-  border: none;
-  padding: 10px;
-  border-radius: 8px;
-  cursor: pointer;
+  width: 38px; height: 38px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  color: var(--text-secondary);
+  transition: var(--t-base);
+  flex-shrink: 0;
+}
+.back-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-bright);
+  color: var(--text-primary);
+  transform: translateX(-2px);
+}
+
+.header-spacer { width: 38px; flex-shrink: 0; }
+
+/* =============================================
+   PORTFOLIO SUMMARY BANNER
+   ============================================= */
+.portfolio-summary {
+  background: var(--bg-card);
+  border: 1px solid var(--sell-border);
+  border-radius: var(--r-xl);
+  padding: var(--s-xl) var(--s-2xl);
   display: flex;
   align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
+  justify-content: space-between;
+  gap: var(--s-lg);
+  flex-wrap: wrap;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--sell-glow);
 }
 
-.back-btn:hover {
-  background: #e0e0e0;
+.portfolio-summary::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--sell), var(--sell-light));
 }
 
-.header-spacer {
-  width: 40px;
+.portfolio-summary::after {
+  content: '';
+  position: absolute;
+  width: 280px; height: 280px;
+  background: radial-gradient(circle, rgba(249,115,22,0.1) 0%, transparent 70%);
+  top: -90px; right: -50px;
+  border-radius: 50%; pointer-events: none;
 }
 
-/* Portfolio Summary */
-.portfolio-summary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 24px;
-  border-radius: 12px;
-  margin-bottom: 24px;
-  color: white;
+.summary-text { position: relative; z-index: 1; }
+
+.summary-text h2 {
+  font-family: var(--font-display);
+  font-size: 1.5rem; font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.03em;
+  margin-bottom: 0.25rem;
 }
 
-.portfolio-summary h2 {
-  font-size: 24px;
-  font-weight: 700;
-  margin: 0 0 8px 0;
+.summary-text p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
 }
 
-.portfolio-summary p {
-  font-size: 14px;
-  margin: 0;
-  opacity: 0.9;
+.summary-stats {
+  display: flex;
+  gap: var(--s-xl);
+  position: relative; z-index: 1;
 }
 
-/* Holdings Grid */
+.summary-stat { text-align: right; }
+
+.summary-stat-label {
+  display: block;
+  font-size: 0.6875rem; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.07em;
+  font-weight: 600; margin-bottom: 0.25rem;
+}
+
+.summary-stat-value {
+  font-family: var(--font-display);
+  font-size: 1.25rem; font-weight: 700;
+  color: var(--text-primary); letter-spacing: -0.02em;
+}
+.summary-stat-value.positive { color: var(--positive); }
+.summary-stat-value.negative { color: var(--negative); }
+
+/* =============================================
+   HOLDINGS GRID
+   ============================================= */
 .holdings-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: var(--s-lg);
 }
 
 .holding-card {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: var(--s-lg);
   cursor: pointer;
-  transition: all 0.3s;
-  border: 2px solid transparent;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: var(--t-base);
+  display: flex; flex-direction: column; gap: var(--s-md);
+  position: relative; overflow: hidden;
+  animation: card-in 0.3s ease both;
+}
+
+.holding-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(249,115,22,0.35), transparent);
+  opacity: 0;
+  transition: var(--t-base);
 }
 
 .holding-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  border-color: #FF5722;
+  border-color: var(--sell-border);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
 }
+.holding-card:hover::before { opacity: 1; }
 
+/* ── Holding Header ── */
 .holding-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 16px;
-  padding-bottom: 16px;
-  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: var(--s-md);
+  border-bottom: 1px solid var(--border);
 }
 
 .holding-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  display: flex; align-items: center; gap: var(--s-md);
 }
 
 .holding-logo {
-  font-size: 32px;
-  width: 50px;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f5f5f5;
-  border-radius: 10px;
+  font-size: 1.625rem;
+  width: 48px; height: 48px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  flex-shrink: 0;
+  transition: var(--t-base);
+}
+.holding-card:hover .holding-logo {
+  background: var(--sell-dim);
+  border-color: var(--sell-border);
 }
 
 .holding-details h3 {
-  font-size: 18px;
-  font-weight: 700;
-  color: #1a1a1a;
-  margin: 0 0 4px 0;
+  font-family: var(--font-display);
+  font-size: 1rem; font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  margin-bottom: 2px;
 }
-
 .holding-details p {
-  font-size: 13px;
-  color: #666;
-  margin: 0;
+  font-size: 0.75rem; color: var(--text-muted);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
-.holding-value {
-  text-align: right;
-}
-
+.holding-value { text-align: right; }
 .holding-value .value {
-  display: block;
-  font-size: 20px;
-  font-weight: 700;
-  color: #1a1a1a;
-  margin-bottom: 4px;
+  font-family: var(--font-display);
+  font-size: 1.125rem; font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  display: block; margin-bottom: 2px;
 }
-
 .holding-value .quantity {
-  font-size: 12px;
-  color: #666;
+  font-size: 0.75rem; color: var(--text-muted);
 }
 
-/* Holding Stats */
+/* ── Holding Stats ── */
 .holding-stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-sm);
 }
 
 .stat {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  display: flex; flex-direction: column; gap: 3px;
+  padding: 0.625rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  transition: var(--t-fast);
 }
+.stat:hover { background: var(--bg-hover); border-color: var(--border-bright); }
 
 .stat .label {
-  font-size: 11px;
-  color: #999;
-  text-transform: uppercase;
-  font-weight: 600;
-  letter-spacing: 0.5px;
+  font-size: 0.6rem; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.07em; font-weight: 700;
 }
-
-.stat .value {
-  font-size: 14px;
-  font-weight: 600;
-  color: #1a1a1a;
-  display: flex;
-  align-items: center;
-  gap: 4px;
+.stat .stat-value {
+  font-family: var(--font-display);
+  font-size: 0.875rem; font-weight: 700;
+  color: var(--text-primary);
+  display: flex; align-items: center; gap: 3px;
+  letter-spacing: -0.01em;
 }
+.stat .stat-value.positive { color: var(--positive); }
+.stat .stat-value.negative { color: var(--negative); }
 
-.stat .value.positive {
-  color: #4CAF50;
-}
-
-.stat .value.negative {
-  color: #f44336;
-}
-
-/* Sell Form View */
+/* =============================================
+   SELL FORM VIEW
+   ============================================= */
 .sell-form-view {
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  display: flex; flex-direction: column; gap: var(--s-xl);
+  animation: fade-in 0.3s ease;
 }
 
+/* ── Selected Holding Header ── */
 .selected-holding-header {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding-bottom: 24px;
-  border-bottom: 2px solid #f0f0f0;
-  margin-bottom: 24px;
+  display: flex; align-items: center; gap: var(--s-lg);
+  background: var(--bg-card);
+  border: 1px solid var(--sell-border);
+  border-radius: var(--r-xl);
+  padding: var(--s-xl) var(--s-2xl);
+  position: relative; overflow: hidden;
+  box-shadow: var(--sell-glow);
+}
+
+.selected-holding-header::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--sell), var(--sell-light));
+}
+
+.selected-holding-header::after {
+  content: '';
+  position: absolute;
+  width: 250px; height: 250px;
+  background: radial-gradient(circle, rgba(249,115,22,0.09) 0%, transparent 70%);
+  top: -80px; right: -40px;
+  border-radius: 50%; pointer-events: none;
 }
 
 .holding-logo-large {
-  font-size: 48px;
-  width: 80px;
-  height: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f5f5f5;
-  border-radius: 16px;
+  font-size: 2rem;
+  width: 68px; height: 68px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--sell-dim);
+  border: 1px solid var(--sell-border);
+  border-radius: var(--r-lg);
+  flex-shrink: 0; position: relative; z-index: 1;
 }
 
 .holding-header-info {
-  flex: 1;
+  flex: 1; min-width: 0; position: relative; z-index: 1;
 }
-
 .holding-header-info h2 {
-  font-size: 28px;
-  font-weight: 700;
-  color: #1a1a1a;
-  margin: 0 0 4px 0;
+  font-family: var(--font-display);
+  font-size: 1.75rem; font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.03em; margin-bottom: 0.25rem;
 }
-
 .holding-header-info p {
-  font-size: 14px;
-  color: #666;
-  margin: 0 0 8px 0;
+  font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.5rem;
 }
-
 .shares-owned {
   display: inline-block;
-  font-size: 13px;
-  color: #666;
-  background: #f0f0f0;
-  padding: 4px 12px;
-  border-radius: 6px;
-  font-weight: 600;
+  font-size: 0.75rem; font-weight: 600;
+  color: var(--sell-light);
+  background: var(--sell-dim);
+  border: 1px solid var(--sell-border);
+  padding: 0.2rem 0.625rem;
+  border-radius: 99px;
 }
 
 .current-price {
-  text-align: right;
+  text-align: right; flex-shrink: 0; position: relative; z-index: 1;
 }
-
 .price-label {
   display: block;
-  font-size: 12px;
-  color: #666;
-  margin-bottom: 4px;
+  font-size: 0.6875rem; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.07em; font-weight: 600; margin-bottom: 0.25rem;
 }
-
 .price-value {
   display: block;
-  font-size: 24px;
-  font-weight: 700;
-  color: #FF5722;
+  font-family: var(--font-display);
+  font-size: 1.75rem; font-weight: 700;
+  color: var(--sell-light); letter-spacing: -0.03em;
 }
 
-/* Order Type Selector */
+/* ── Order Type Selector ── */
 .order-type-selector {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 24px;
+  display: flex; gap: 0.25rem;
+  background: var(--bg-card);
+  padding: 4px;
+  border-radius: var(--r-xl);
+  border: 1px solid var(--border);
 }
 
 .order-type-btn {
-  flex: 1;
-  padding: 12px 24px;
-  border: 2px solid #e8e8e8;
-  background: white;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
-  color: #666;
+  flex: 1; padding: 0.625rem 1.25rem;
+  border-radius: calc(var(--r-xl) - 4px);
+  font-size: 0.875rem; font-weight: 600;
+  color: var(--text-muted);
+  transition: var(--t-base); text-align: center;
 }
-
+.order-type-btn:hover:not(.active) { color: var(--text-secondary); }
 .order-type-btn.active {
-  border-color: #FF5722;
-  background: #fff3e0;
-  color: #FF5722;
+  background: var(--sell);
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(249,115,22,0.4);
 }
 
-.order-type-btn:hover:not(.active) {
-  border-color: #ccc;
-}
-
-/* Form Section */
+/* ── Form Section ── */
 .form-section {
-  margin-bottom: 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: var(--s-xl);
+  display: flex; flex-direction: column; gap: var(--s-lg);
 }
 
 .form-group {
-  margin-bottom: 20px;
+  display: flex; flex-direction: column; gap: 0.4rem;
   position: relative;
 }
-
 .form-group label {
-  display: block;
-  font-size: 14px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 8px;
+  font-size: 0.75rem; font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase; letter-spacing: 0.07em;
 }
-
 .form-group input {
   width: 100%;
-  padding: 14px 80px 14px 16px;
-  border: 2px solid #e8e8e8;
-  border-radius: 8px;
-  font-size: 16px;
-  outline: none;
-  transition: all 0.3s;
+  padding: 0.6875rem 4rem 0.6875rem 0.875rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  color: var(--text-primary);
+  font-size: 0.9375rem; font-weight: 500;
+  transition: var(--t-base);
 }
-
+.form-group input::placeholder { color: var(--text-muted); }
 .form-group input:focus {
-  border-color: #FF5722;
-  box-shadow: 0 0 0 3px rgba(255, 87, 34, 0.1);
+  border-color: var(--sell-border);
+  background: var(--bg-hover);
+  box-shadow: 0 0 0 3px var(--sell-dim);
+  outline: none;
 }
+.form-group input[type="number"]::-webkit-inner-spin-button,
+.form-group input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+.form-group input[type="number"] { -moz-appearance: textfield; }
 
 .input-suffix {
-  position: absolute;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #999;
-  font-size: 14px;
-  font-weight: 600;
-  margin-top: 14px;
+  position: absolute; right: 0.875rem; bottom: 0.75rem;
+  color: var(--text-muted);
+  font-size: 0.6875rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.05em;
+  pointer-events: none;
 }
 
-/* Quick Amounts */
+/* ── % Quick-amount chips ── */
 .quick-amounts {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  margin-bottom: 20px;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.375rem;
+}
+.quick-chip {
+  padding: 0.4375rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  font-size: 0.8125rem; font-weight: 700;
+  color: var(--text-secondary);
+  transition: var(--t-spring);
+  text-align: center;
+}
+.quick-chip:hover {
+  background: var(--sell-dim);
+  border-color: var(--sell-border);
+  color: var(--sell-light);
+  transform: translateY(-1px);
+}
+.quick-chip.active {
+  background: var(--sell-dim);
+  border-color: var(--sell-border);
+  color: var(--sell-light);
 }
 
-.quick-amounts button {
-  padding: 10px;
-  border: 2px solid #e8e8e8;
-  background: white;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  color: #666;
-}
-
-.quick-amounts button:hover {
-  border-color: #FF5722;
-  color: #FF5722;
-  background: #fff3e0;
-}
-
-/* Order Summary */
+/* ── Order Summary ── */
 .order-summary {
-  background: #f8f9fa;
-  padding: 20px;
-  border-radius: 8px;
-  margin-top: 24px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
 }
 
 .summary-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 0;
-  font-size: 15px;
-  color: #666;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.75rem var(--s-lg);
+  border-bottom: 1px solid var(--border);
+  font-size: 0.875rem;
 }
+.summary-row:last-child { border-bottom: none; }
+.summary-row span:first-child { color: var(--text-muted); font-weight: 500; }
+.summary-row span:last-child  { color: var(--text-secondary); font-weight: 600; }
 
 .summary-row.profit-loss {
-  border-top: 1px dashed #e0e0e0;
-  margin-top: 8px;
-  padding-top: 16px;
-  font-weight: 600;
+  background: var(--bg-card-alt, var(--bg-hover));
+  border-top: 1px dashed rgba(255,255,255,0.06);
 }
-
-.summary-row.profit-loss.positive {
-  color: #4CAF50;
-}
-
-.summary-row.profit-loss.negative {
-  color: #f44336;
-}
+.summary-row.profit-loss span { font-weight: 700; }
+.summary-row.profit-loss.positive span:last-child { color: var(--positive); }
+.summary-row.profit-loss.negative span:last-child { color: var(--negative); }
 
 .summary-row.total {
-  border-top: 2px solid #e0e0e0;
-  margin-top: 8px;
-  padding-top: 16px;
-  font-size: 18px;
-  font-weight: 700;
-  color: #1a1a1a;
+  background: var(--bg-hover);
+  padding: var(--s-md) var(--s-lg);
+}
+.summary-row.total span:first-child {
+  font-family: var(--font-display);
+  font-size: 0.9375rem; font-weight: 700;
+  color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.04em;
+}
+.summary-row.total .total-value {
+  font-family: var(--font-display);
+  font-size: 1.375rem; font-weight: 700;
+  color: var(--sell-light); letter-spacing: -0.02em;
 }
 
-/* Form Actions */
-.form-actions {
-  display: flex;
-  gap: 12px;
-  margin-top: 24px;
-}
-
-.cancel-btn,
-.sell-btn {
-  flex: 1;
-  padding: 16px 24px;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
+/* ── Form Actions ── */
+.form-actions { display: flex; gap: var(--s-md); }
 
 .cancel-btn {
-  background: #f0f0f0;
-  color: #666;
+  flex: 0 0 auto;
+  padding: 0.75rem 1.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  color: var(--text-secondary);
+  font-size: 0.9375rem; font-weight: 600;
+  transition: var(--t-base);
 }
-
 .cancel-btn:hover {
-  background: #e0e0e0;
+  background: var(--bg-hover);
+  border-color: var(--border-bright);
+  color: var(--text-primary);
 }
 
 .sell-btn {
-  background: #FF5722;
-  color: white;
+  flex: 1;
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--sell); color: #fff;
+  border-radius: var(--r-lg);
+  font-size: 0.9375rem; font-weight: 700;
+  box-shadow: 0 4px 16px rgba(249,115,22,0.35);
+  transition: var(--t-spring);
 }
-
 .sell-btn:hover:not(:disabled) {
-  background: #f4511e;
+  background: var(--sell-light);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 87, 34, 0.3);
+  box-shadow: 0 6px 22px rgba(249,115,22,0.5);
 }
+.sell-btn:active:not(:disabled) { transform: translateY(0); }
+.sell-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-.sell-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* Confirmation Modal */
+/* =============================================
+   CONFIRMATION MODAL
+   ============================================= */
 .confirmation-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 20px;
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(3,5,15,0.8);
+  backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  padding: var(--s-md);
+  animation: fade-in 0.2s ease;
 }
 
 .modal-content {
-  background: white;
-  border-radius: 16px;
-  padding: 32px;
-  max-width: 500px;
-  width: 100%;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  background: var(--bg-card);
+  border: 1px solid var(--border-bright);
+  border-radius: var(--r-2xl);
+  padding: var(--s-2xl);
+  max-width: 480px; width: 100%;
+  box-shadow: var(--shadow-xl), var(--sell-glow);
+  animation: slide-up 0.3s var(--t-spring);
+  position: relative; overflow: hidden;
 }
-
+.modal-content::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--sell), var(--accent-violet));
+}
 .modal-content h3 {
-  font-size: 24px;
-  font-weight: 700;
-  margin: 0 0 24px 0;
-  color: #1a1a1a;
+  font-family: var(--font-display);
+  font-size: 1.375rem; font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em; margin-bottom: var(--s-lg);
 }
 
 .confirmation-details {
-  background: #f8f9fa;
-  padding: 20px;
-  border-radius: 8px;
-  margin-bottom: 24px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  margin-bottom: var(--s-xl);
 }
 
-.confirmation-details p {
-  margin: 12px 0;
-  font-size: 15px;
-  color: #666;
+.confirm-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.75rem var(--s-lg);
+  border-bottom: 1px solid var(--border);
+  font-size: 0.875rem;
+}
+.confirm-row:last-child { border-bottom: none; }
+.confirm-row .confirm-label { color: var(--text-muted); font-weight: 500; }
+.confirm-row .confirm-value { color: var(--text-primary); font-weight: 600; }
+
+.confirm-row.profit-loss-row { background: var(--bg-hover); }
+.confirm-row.profit-loss-row .confirm-label { font-weight: 600; color: var(--text-secondary); }
+.confirm-row.profit-loss-row.positive .confirm-value { color: var(--positive); font-weight: 700; }
+.confirm-row.profit-loss-row.negative .confirm-value { color: var(--negative); font-weight: 700; }
+
+.confirm-row.total-row {
+  background: var(--bg-hover);
+  padding: var(--s-md) var(--s-lg);
+}
+.confirm-row.total-row .confirm-label {
+  font-family: var(--font-display);
+  font-size: 0.9375rem; font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+.confirm-row.total-row .confirm-value {
+  font-family: var(--font-display);
+  font-size: 1.375rem; font-weight: 700;
+  color: var(--sell-light); letter-spacing: -0.02em;
 }
 
-.confirmation-details p strong {
-  color: #1a1a1a;
-  margin-right: 8px;
-}
-
-.confirmation-details .profit-loss {
-  border-top: 1px dashed #e0e0e0;
-  padding-top: 12px;
-  margin-top: 12px;
-  font-weight: 600;
-}
-
-.confirmation-details .profit-loss.positive {
-  color: #4CAF50;
-}
-
-.confirmation-details .profit-loss.negative {
-  color: #f44336;
-}
-
-.total-amount {
-  border-top: 2px solid #e0e0e0;
-  padding-top: 12px;
-  margin-top: 12px;
-  font-size: 18px !important;
-  font-weight: 700;
-  color: #1a1a1a !important;
-}
-
-.modal-actions {
-  display: flex;
-  gap: 12px;
-}
+.modal-actions { display: flex; gap: var(--s-md); }
 
 .confirm-btn {
   flex: 1;
-  padding: 16px 24px;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s;
-  background: #4CAF50;
-  color: white;
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--sell); color: #fff;
+  border-radius: var(--r-lg);
+  font-size: 0.9375rem; font-weight: 700;
+  box-shadow: 0 4px 16px rgba(249,115,22,0.35);
+  transition: var(--t-spring);
 }
-
-.confirm-btn.sell {
-  background: #FF5722;
-}
-
 .confirm-btn:hover {
+  background: var(--sell-light);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 22px rgba(249,115,22,0.5);
+}
+.confirm-btn:active { transform: translateY(0); }
+
+/* =============================================
+   SUCCESS OVERLAY
+   ============================================= */
+.success-overlay {
+  position: fixed; inset: 0; z-index: 1001;
+  background: rgba(3,5,15,0.85);
+  backdrop-filter: blur(10px);
+  display: flex; align-items: center; justify-content: center;
+  padding: var(--s-md);
+  animation: fade-in 0.2s ease;
 }
 
-.confirm-btn.sell:hover {
-  background: #f4511e;
+.success-card {
+  background: var(--bg-card);
+  border: 1px solid var(--positive-border);
+  border-radius: var(--r-2xl);
+  padding: var(--s-2xl);
+  max-width: 420px; width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow-xl), 0 0 40px rgba(52,211,153,0.12);
+  animation: slide-up 0.35s var(--t-spring);
 }
 
-/* Responsive Design */
+.success-icon {
+  width: 72px; height: 72px;
+  background: var(--positive-bg);
+  border: 2px solid var(--positive-border);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto var(--s-lg);
+  color: var(--positive);
+}
+
+.success-card h3 {
+  font-family: var(--font-display);
+  font-size: 1.5rem; font-weight: 700;
+  color: var(--text-primary); letter-spacing: -0.02em; margin-bottom: 0.5rem;
+}
+.success-card p { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: var(--s-xl); line-height: 1.6; }
+
+.success-actions { display: flex; flex-direction: column; gap: var(--s-sm); }
+
+.success-primary-btn {
+  padding: 0.75rem;
+  background: var(--brand); color: #fff;
+  border-radius: var(--r-lg);
+  font-size: 0.9375rem; font-weight: 700;
+  box-shadow: 0 4px 16px rgba(79,124,255,0.35);
+  transition: var(--t-spring);
+}
+.success-primary-btn:hover { background: var(--brand-light); transform: translateY(-2px); }
+
+.success-secondary-btn {
+  padding: 0.75rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  color: var(--text-secondary);
+  font-size: 0.9375rem; font-weight: 600;
+  transition: var(--t-base);
+}
+.success-secondary-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+/* =============================================
+   RESPONSIVE
+   ============================================= */
+@media (max-width: 1024px) {
+  .sell-assets-container { padding: var(--s-lg); gap: var(--s-lg); }
+  .holdings-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+}
+
 @media (max-width: 768px) {
-  .sell-assets-container {
-    padding: 12px;
-  }
+  .sell-assets-container { padding: var(--s-md); gap: var(--s-md); }
+  .sell-header { padding: var(--s-md) var(--s-lg); }
+  .sell-header h1 { font-size: 1.25rem; }
 
-  .holdings-grid {
-    grid-template-columns: 1fr;
-  }
+  .portfolio-summary { flex-direction: column; align-items: flex-start; padding: var(--s-lg); }
+  .summary-stats { width: 100%; justify-content: space-between; }
+  .summary-stat  { text-align: left; }
 
-  .holding-stats {
-    grid-template-columns: 1fr;
-  }
+  .holdings-grid { grid-template-columns: 1fr 1fr; gap: var(--s-md); }
+  .holding-stats { grid-template-columns: 1fr; }
 
-  .selected-holding-header {
-    flex-direction: column;
-    text-align: center;
-  }
+  .selected-holding-header { flex-wrap: wrap; padding: var(--s-lg); }
+  .holding-header-info h2  { font-size: 1.375rem; }
+  .current-price { width: 100%; text-align: left; display: flex; align-items: center; gap: var(--s-md); }
+  .price-label   { margin-bottom: 0; }
+  .price-value   { font-size: 1.5rem; }
 
-  .current-price {
-    text-align: center;
-  }
+  .form-section  { padding: var(--s-lg); }
+  .form-actions  { flex-direction: column-reverse; }
+  .cancel-btn    { width: 100%; justify-content: center; }
 
-  .quick-amounts {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  .modal-content { padding: var(--s-xl); }
+  .modal-actions { flex-direction: column-reverse; }
 
-  .form-actions,
-  .modal-actions {
-    flex-direction: column;
-  }
+  .quick-amounts { grid-template-columns: repeat(4, 1fr); }
+}
 
-  .modal-content {
-    padding: 24px;
-  }
+@media (max-width: 640px) {
+  .holdings-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .sell-assets-container { padding: 0.75rem; gap: 0.875rem; }
+  .sell-header { padding: 0.75rem var(--s-md); border-radius: var(--r-lg); }
+  .sell-header h1 { font-size: 1.1rem; }
+  .back-btn { width: 34px; height: 34px; }
+  .header-spacer { width: 34px; }
+
+  .portfolio-summary { padding: var(--s-md); border-radius: var(--r-lg); }
+  .summary-text h2 { font-size: 1.25rem; }
+  .summary-stats { flex-direction: column; gap: var(--s-sm); }
+  .summary-stat  { display: flex; justify-content: space-between; align-items: center; }
+  .summary-stat-label { margin-bottom: 0; }
+
+  .holding-logo-large { width: 56px; height: 56px; font-size: 1.625rem; }
+  .holding-header-info h2 { font-size: 1.25rem; }
+
+  .holding-stats { grid-template-columns: repeat(3, 1fr); }
+
+  .modal-content { padding: var(--s-lg); border-radius: var(--r-xl); }
+  .modal-content h3 { font-size: 1.1rem; }
+  .success-card { padding: var(--s-xl); }
+}
+
+@media (max-width: 360px) {
+  .sell-assets-container { padding: 0.5rem; }
+  .holdings-grid { gap: 0.5rem; }
+  .holding-card  { padding: var(--s-md); }
+  .holding-stats { grid-template-columns: 1fr; }
+  .quick-amounts { grid-template-columns: repeat(2, 1fr); }
+  .order-type-btn { font-size: 0.8125rem; padding: 0.5rem; }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .sell-assets-container { padding: var(--s-sm) var(--s-md); gap: var(--s-md); }
+  .holdings-grid { grid-template-columns: repeat(3, 1fr); }
+  .confirmation-modal, .success-overlay { align-items: flex-start; overflow-y: auto; padding-top: var(--s-md); }
+}
+
+@media (hover: none) {
+  .holding-card:hover  { transform: none; }
+  .sell-btn:hover      { transform: none; }
+  .confirm-btn:hover   { transform: none; }
+  .back-btn:hover      { transform: none; }
+  .quick-chip:hover    { transform: none; }
+}
+
+@media print {
+  .sell-header .back-btn, .form-actions, .modal-actions,
+  .confirmation-modal, .success-overlay { display: none !important; }
+  body { background: white; color: black; }
 }
