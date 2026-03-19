@@ -1,163 +1,207 @@
-# 💸 FinFlow
+# FinFlow 💸
 
-> Smart personal finance management — track, analyze, and grow your wealth effortlessly.
-
-![FinFlow Banner](https://via.placeholder.com/1200x400/6C63FF/FFFFFF?text=FinFlow+-+Take+Control+of+Your+Finances)
+A full-stack financial management platform built with **Next.js 14**, **Prisma**, **NextAuth**, and **WebSockets** — featuring real-time updates, a complete user profile system, authentication, and a Redux-powered frontend.
 
 ---
 
-## 📖 Overview
+## 🚀 Tech Stack
 
-**FinFlow** is a modern personal finance application designed to help individuals and households take full control of their financial lives. From tracking daily expenses to visualizing long-term savings goals, FinFlow brings clarity to your cash flow.
-
----
-
-## ✨ Features
-
-- 💳 **Expense Tracking** — Log and categorize transactions in real time
-- 📊 **Interactive Dashboards** — Visualize spending patterns with rich charts and graphs
-- 🎯 **Budget Goals** — Set monthly budgets per category and track progress
-- 🔔 **Smart Alerts** — Get notified when you're approaching budget limits
-- 🏦 **Account Management** — Connect and manage multiple bank accounts in one place
-- 📅 **Recurring Transactions** — Automatically track subscriptions and bills
-- 📤 **Export Reports** — Download financial summaries as PDF or CSV
-- 🔒 **Secure & Private** — Bank-grade encryption for all your data
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 14 (App Router) |
+| Language | TypeScript |
+| Database ORM | Prisma |
+| Authentication | NextAuth.js (Credentials + OAuth) |
+| State Management | Redux Toolkit |
+| Real-time | WebSockets (`ws`) |
+| Styling | Tailwind CSS |
+| Validation | Zod |
+| Password Hashing | bcryptjs |
 
 ---
 
-## 🚀 Getting Started
-
-### Prerequisites
-
-- Node.js `v18+`
-- npm or yarn
-- MongoDB (or your configured database)
-
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/your-username/finflow.git
-
-# Navigate to the project directory
-cd finflow
-
-# Install dependencies
-npm install
-
-# Set up environment variables
-cp .env.example .env
-```
-
-### Environment Variables
-
-Create a `.env` file in the root directory:
-
-```env
-PORT=3000
-DATABASE_URL=mongodb://localhost:27017/finflow
-JWT_SECRET=your_jwt_secret_key
-API_KEY=your_api_key
-```
-
-### Running the App
-
-```bash
-# Development mode
-npm run dev
-
-# Production build
-npm run build
-npm start
-```
-
----
-
-## 🗂️ Project Structure
+## 📁 Project Structure
 
 ```
 finflow/
-├── src/
-│   ├── components/       # Reusable UI components
-│   ├── pages/            # App pages/views
-│   ├── services/         # API & business logic
-│   ├── store/            # State management
-│   ├── utils/            # Helper functions
-│   └── styles/           # Global styles
-├── public/               # Static assets
-├── tests/                # Unit & integration tests
-├── .env.example
-├── package.json
-└── README.md
+├── app/
+│   ├── api/
+│   │   └── profile/
+│   │       ├── update/          # POST – update profile fields
+│   │       ├── notifications/   # GET/POST – notification preferences
+│   │       ├── privacy/         # GET/POST – privacy settings
+│   │       ├── appearance/      # GET/POST – appearance settings
+│   │       ├── activity/        # GET – recent activity logs
+│   │       ├── sessions/        # GET/DELETE – active device sessions
+│   │       ├── password/        # POST – change password
+│   │       ├── upload-image/    # POST – avatar upload
+│   │       ├── export/          # GET – download account data as JSON
+│   │       └── delete/          # POST – permanently delete account
+│   └── profile/
+│       ├── page.tsx             # Profile settings UI
+│       └── profile.css
+├── lib/
+│   ├── auth.ts                  # NextAuth configuration
+│   └── prisma.ts                # Prisma client singleton
+├── store/
+│   ├── index.ts                 # Redux store
+│   └── slices/
+│       └── websocketSlice.ts    # WebSocket state slice
+├── types/
+│   ├── next-auth.d.ts           # NextAuth type augmentation
+│   └── websocket.ts             # WebSocket types
+├── prisma/
+│   └── schema.prisma            # Database schema
+├── server.ts                    # Custom WebSocket server
+├── public/
+│   └── uploads/
+│       └── avatars/             # Uploaded profile images
+└── package.json
 ```
 
 ---
 
-## 🛠️ Tech Stack
+## ⚙️ Getting Started
 
-| Layer      | Technology          |
-|------------|---------------------|
-| Frontend   | React / Next.js     |
-| Backend    | Node.js / Express   |
-| Database   | MongoDB             |
-| Auth       | JWT / OAuth 2.0     |
-| Charts     | Recharts / D3.js    |
-| Styling    | Tailwind CSS        |
-| Testing    | Jest / Cypress      |
-
----
-
-## 🧪 Running Tests
+### 1. Clone the repository
 
 ```bash
-# Run unit tests
-npm test
+git clone https://github.com/your-username/finflow.git
+cd finflow
+```
 
-# Run end-to-end tests
-npm run test:e2e
+### 2. Install dependencies
 
-# Test coverage report
-npm run test:coverage
+```bash
+npm install
+```
+
+### 3. Set up environment variables
+
+Create a `.env` file in the root:
+
+```env
+# Database
+DATABASE_URL="postgresql://user:password@localhost:5432/finflow"
+
+# NextAuth
+NEXTAUTH_SECRET="your-super-secret-key"
+NEXTAUTH_URL="http://localhost:3000"
+
+# OAuth Providers (optional)
+GOOGLE_CLIENT_ID="your-google-client-id"
+GOOGLE_CLIENT_SECRET="your-google-client-secret"
+GITHUB_ID="your-github-client-id"
+GITHUB_SECRET="your-github-client-secret"
+```
+
+### 4. Run database migrations
+
+```bash
+npx prisma migrate dev --name init
+npx prisma generate
+```
+
+### 5. Start the development server
+
+```bash
+npm run dev
+```
+
+The app will be available at [http://localhost:3000](http://localhost:3000).
+
+---
+
+## 🗄️ Database Schema
+
+The Prisma schema defines the following models:
+
+| Model | Description |
+|---|---|
+| `User` | Core user with profile fields (bio, phone, location, social links, etc.) |
+| `Account` | OAuth provider accounts (NextAuth) |
+| `Session` | JWT sessions (NextAuth) |
+| `VerificationToken` | Email verification tokens |
+| `NotificationPreference` | Per-user email/push/marketing notification toggles |
+| `PrivacySetting` | Profile visibility, show email/phone/location, searchability |
+| `AppearanceSetting` | Dark mode, theme color, font size, language |
+| `ActivityLog` | Timestamped log of user actions with device/IP info |
+| `UserSession` | Custom device session tracking (separate from NextAuth sessions) |
+
+---
+
+## 🔐 Authentication
+
+Authentication is handled by **NextAuth.js** with the following providers:
+
+- **Credentials** (email + password with bcrypt)
+- **Google OAuth**
+- **GitHub OAuth**
+
+Sessions use the **JWT strategy**. The session callback enriches `session.user` with `id` and `createdAt` from the database on every request.
+
+---
+
+## 👤 Profile System
+
+The profile page (`/profile`) offers six tabs, each backed by dedicated API routes:
+
+- **General** — Edit name, email, phone, bio, date of birth, location, occupation, social links, and avatar
+- **Security** — Change password (with strength validation), manage active device sessions, export data, delete account
+- **Notifications** — Toggle email, push, marketing, security, comments, mentions, and product update notifications
+- **Privacy** — Control profile visibility, show/hide contact info, allow messages, activity status, search discoverability
+- **Appearance** — Dark mode, theme color, compact view, font size, language
+- **Activity** — View last 50 logged actions with device and location info
+
+---
+
+## 🔄 Real-time (WebSockets)
+
+A custom WebSocket server runs in `server.ts` alongside the Next.js app. WebSocket state is managed in Redux via `websocketSlice.ts`.
+
+To run the server with WebSocket support:
+
+```bash
+npx ts-node server.ts
 ```
 
 ---
 
-## 📸 Screenshots
+## 📦 Key Scripts
 
-| Dashboard | Budgets | Transactions |
-|-----------|---------|--------------|
-| ![Dashboard](https://via.placeholder.com/300x200/6C63FF/fff?text=Dashboard) | ![Budgets](https://via.placeholder.com/300x200/43C59E/fff?text=Budgets) | ![Transactions](https://via.placeholder.com/300x200/FF6584/fff?text=Transactions) |
+```bash
+npm run dev          # Start Next.js dev server
+npm run build        # Build for production
+npm run start        # Start production server
+npx prisma studio    # Open Prisma database GUI
+npx prisma migrate dev   # Run migrations in development
+npx prisma generate  # Regenerate Prisma client
+```
 
 ---
 
-## 🤝 Contributing
+## 🖼️ Image Uploads
 
-Contributions are welcome! Please follow these steps:
+Profile avatars are saved to `/public/uploads/avatars/<userId>.<ext>` on the server and served as static files. Supported formats: **JPEG, PNG, WebP, GIF**. Max file size: **5MB**.
 
-1. Fork the repository
-2. Create a new branch: `git checkout -b feature/your-feature-name`
-3. Commit your changes: `git commit -m 'Add some feature'`
-4. Push to the branch: `git push origin feature/your-feature-name`
-5. Open a Pull Request
+---
 
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for our code of conduct and guidelines.
+## 📤 Data Export
+
+Users can download all their account data (profile, settings, activity logs) as a `.json` file from the Security tab or via `GET /api/profile/export`.
+
+---
+
+## 🗑️ Account Deletion
+
+Account deletion (`POST /api/profile/delete`) requires:
+1. The user's current password
+2. Typing `DELETE` as confirmation
+
+All associated records are removed in a single Prisma transaction: activity logs, sessions, settings, OAuth accounts, and the user record itself.
 
 ---
 
 ## 📄 License
 
-This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
-
----
-
-## 📬 Contact
-
-Have questions or feedback? Reach out!
-
-- 🌐 Website: [finflow.app](https://finflow.app)
-- 📧 Email: hello@finflow.app
-- 🐦 Twitter: [@FinFlowApp](https://twitter.com/FinFlowApp)
-
----
-
-<p align="center">Made with ❤️ by the FinFlow Team</p>
+MIT © FinFlow
