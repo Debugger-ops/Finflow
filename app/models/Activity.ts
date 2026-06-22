@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, models } from 'mongoose';
+import mongoose, { Schema, Document, Model, models } from 'mongoose';
 
 export interface IActivity extends Document {
   userId: string;
@@ -6,6 +6,8 @@ export interface IActivity extends Document {
   device?: string;
   location?: string;
   ipAddress?: string;
+  userAgent?: string;
+  metadata?: Record<string, any>;
   createdAt: Date;
 }
 
@@ -29,9 +31,18 @@ const ActivitySchema = new Schema<IActivity>(
     ipAddress: {
       type: String,
     },
+    userAgent: {
+      type: String,
+    },
+    metadata: {
+      type: Schema.Types.Mixed,
+      default: {},
+    },
   },
   { timestamps: true }
 );
 
-export default models.Activity ||
-  mongoose.model<IActivity>('Activity', ActivitySchema);
+const Activity: Model<IActivity> =
+  (models.Activity as Model<IActivity>) || mongoose.model<IActivity>('Activity', ActivitySchema);
+
+export default Activity;

@@ -27,7 +27,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       return NextResponse.json({ error: "Goal not found" }, { status: 404 });
     }
 
-    goal.currentAmount = (goal.currentAmount || 0) + amount;
+    // Field is `current` in the Goal schema (was incorrectly `currentAmount`).
+    goal.current = (goal.current || 0) + amount;
     await goal.save();
 
     return NextResponse.json({ success: true, goal });

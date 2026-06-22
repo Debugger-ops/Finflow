@@ -1,13 +1,15 @@
 // app/api/profile/sessions/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../../auth/[...nextauth]/route";
+import { authOptions } from "../../../libs/auth";
+import { connectDB } from "../../../libs/mongoConnect";
 import Session from "../../../models/Session"; // Mongoose session model
 import { logActivity } from "../../../libs/activity-logger";
 
 // GET all active sessions for current user
 export async function GET(request: NextRequest) {
   try {
+    await connectDB();
     const session = await getServerSession(authOptions);
 
     if (!session || !session.user) {
@@ -43,6 +45,7 @@ export async function GET(request: NextRequest) {
 // DELETE a specific session
 export async function DELETE(request: NextRequest) {
   try {
+    await connectDB();
     const session = await getServerSession(authOptions);
 
     if (!session || !session.user) {
@@ -85,6 +88,7 @@ export async function DELETE(request: NextRequest) {
 // POST: Terminate all other sessions except current
 export async function POST(request: NextRequest) {
   try {
+    await connectDB();
     const session = await getServerSession(authOptions);
 
     if (!session || !session.user) {

@@ -1,5 +1,5 @@
 // models/Goal.ts
-import mongoose, { Schema, model, models } from 'mongoose';
+import mongoose, { Schema, Model, model, models } from 'mongoose';
 
 export interface IGoal {
   _id: string;
@@ -117,6 +117,6 @@ goalSchema.statics.findByUser = function(userId: string) {
 // Pre-save middleware to validate deadline is in the future
 // Pre-save middleware to validate deadline is in the future
 
-const Goal = models.Goal || model<IGoal>('Goal', goalSchema);
+const Goal: Model<IGoal> = (models.Goal as Model<IGoal>) || model<IGoal>('Goal', goalSchema);
 
 export default Goal;

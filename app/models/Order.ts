@@ -1,4 +1,4 @@
-import mongoose, { Schema, model, models } from "mongoose";
+import mongoose, { Schema, Model, model, models } from "mongoose";
 
 interface Order {
   userId: string;
@@ -24,5 +24,5 @@ const orderSchema = new Schema<Order>({
   createdAt: { type: Date, default: Date.now },
 });
 
-const OrderModel = models.Order || model<Order>("Order", orderSchema);
+const OrderModel: Model<Order> = (models.Order as Model<Order>) || model<Order>("Order", orderSchema);
 export default OrderModel;

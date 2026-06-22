@@ -1,7 +1,8 @@
 // app/api/profile/export/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '../../auth/[...nextauth]/route';
+import { authOptions } from '../../../libs/auth';
+import { connectDB } from '../../../libs/mongoConnect';
 import User, { IUser } from '../../../models/User'; // Mongoose User model
 import { logActivity } from '../../../libs/activity-logger';
 
@@ -13,6 +14,8 @@ export async function GET(request: NextRequest) {
     if (!session || !session.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    await connectDB();
 
     // Fetch user data directly (no populate, all fields are embedded)
     const user = await User.findById(session.user.id).lean<IUser>();

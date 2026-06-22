@@ -1,13 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '../../auth/[...nextauth]/route';
-import { z } from 'zod';
-import { connectDB } from '../../../libs/mongoConnect';
-import Profile from '../../../models/Profile';
-import { logActivity } from '../../../libs/activity-logger';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../../libs/auth";
+import { connectDB } from "../../../libs/mongoConnect";
+import { getOrCreateSettings } from "../../../models/UserSettings";
+import { logActivity } from "../../../libs/activity-logger";
+import { z } from "zod";
 
-const privacySchema = z.object({
-  profileVisibility: z.enum(['public', 'private', 'friends']).optional(),
+const schema = z.object({
+  profileVisibility: z.enum(["public", "private", "friends"]).optional(),
   showEmail: z.boolean().optional(),
   showPhone: z.boolean().optional(),
   showLocation: z.boolean().optional(),
@@ -16,70 +16,33 @@ const privacySchema = z.object({
   searchable: z.boolean().optional(),
 });
 
-export async function GET(request: NextRequest) {
-  try {
-    const session = await getServerSession(authOptions);
-
-    if (!session || !session.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    await connectDB();
-
-    const profile = await Profile.findOne({ userId: session.user.id }).lean();
-
-    if (!profile) {
-      return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
-    }
-
-    return NextResponse.json({ success: true, data: profile });
-  } catch (error) {
-    console.error('Fetch privacy settings error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+export async function GET() {
+  const session = await getServerSession(authOptions);
+  if (!(session?.user as any)?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  await connectDB();
+  const settings = await getOrCreateSettings((session!.user as any).id);
+  return NextResponse.json({ success: true, data: settings.privacy });
 }
 
 export async function POST(request: NextRequest) {
-  try {
-    const session = await getServerSession(authOptions);
-
-    if (!session || !session.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const body = await request.json();
-    const validatedData = privacySchema.parse(body);
-
-    await connectDB();
-
-    const profile = await Profile.findOneAndUpdate(
-      { userId: session.user.id },
-      { $set: validatedData },
-      { upsert: true, new: true }
-    );
-
-    // Log activity
-    await logActivity({
-      userId: session.user.id,
-      action: 'Privacy settings updated',
-      request,
-    });
-
-    return NextResponse.json({
-      success: true,
-      message: 'Privacy settings updated successfully',
-      data: profile,
-    });
-  } catch (error) {
-    console.error('Update privacy settings error:', error);
-
-   if (error instanceof z.ZodError) {
-  return NextResponse.json({
-    error: 'Validation error',
-    details: error.issues, // ✅ correct property
-  }, { status: 400 });
-}
-
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  const session = await getServerSession(authOptions);
+  if (!(session?.user as any)?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  const parsed = schema.safeParse(await request.json().catch(() => ({})));
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Validation error", details: parsed.error.issues }, { status: 400 });
+  }
+
+  await connectDB();
+  const userId = (session!.user as any).id;
+  const settings = await getOrCreateSettings(userId);
+  Object.assign(settings.privacy, parsed.data); // previously dropped — schema now defines these fields
+  await settings.save();
+
+  await logActivity({ userId, action: "Privacy settings updated", request });
+  return NextResponse.json({ success: true, message: "Privacy settings updated", data: settings.privacy });
 }

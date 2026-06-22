@@ -1,7 +1,8 @@
 // app/api/profile/password/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '../../auth/[...nextauth]/route';
+import { authOptions } from '../../../libs/auth';
+import { connectDB } from '../../../libs/mongoConnect';
 import User from '../../../models/User'; // Mongoose User model
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
@@ -29,6 +30,8 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const validatedData = passwordSchema.parse(body);
+
+    await connectDB();
 
     // Get user with password
     const user = await User.findById(session.user.id).select('+password'); // Ensure password is selected

@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, models, model } from 'mongoose';
+import mongoose, { Schema, Document, Model, models, model } from 'mongoose';
 
 export interface IProfile extends Document {
   userId: string;
@@ -29,4 +29,7 @@ const ProfileSchema = new Schema<IProfile>(
   { timestamps: true }
 );
 
-export default models.Profile || model<IProfile>('Profile', ProfileSchema);
+const Profile: Model<IProfile> =
+  (models.Profile as Model<IProfile>) || model<IProfile>('Profile', ProfileSchema);
+
+export default Profile;
