@@ -1,10 +1,8 @@
-// pages/api/profile.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '../auth/[...nextauth]/route';
+import { authOptions } from '../../libs/auth';
 import { connectDB } from '../../libs/mongoConnect';
-import  User  from '../../models/User';
-import Transaction from "./../../models/Transaction"; 
+import User from '../../models/User';
 
 export async function GET(request: NextRequest) {
   try {

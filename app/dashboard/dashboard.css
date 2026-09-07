@@ -2,36 +2,36 @@
 
 /* ── VARIABLES ── */
 :root {
-  --bg-primary:      #05070f;
-  --bg-secondary:    #0b0e1c;
-  --bg-card:         #0f1221;
-  --bg-card-2:       #141729;
-  --bg-hover:        #1a1f35;
+  --bg-primary:      #060912;
+  --bg-secondary:    #0b0f1d;
+  --bg-card:         #11162a;
+  --bg-card-2:       #161d34;
+  --bg-hover:        #1d2542;
   --bg-glass:        rgba(255,255,255,0.03);
 
-  --text-primary:    #eef0ff;
-  --text-secondary:  #7f8db0;
-  --text-muted:      #404870;
+  --text-primary:    #eef1fb;
+  --text-secondary:  #9aa6cc;
+  --text-muted:      #5f6a92;
   --text-accent:     #a5b4fc;
 
   --border:          rgba(255,255,255,0.065);
   --border-bright:   rgba(165,180,252,0.22);
 
-  --brand:           #6d7eff;
+  --brand:           #6d7cff;
   --brand-2:         #a78bfa;
-  --brand-gradient:  linear-gradient(135deg,#5b6af7,#9b6bff,#c084fc);
-  --brand-glow:      rgba(109,126,255,0.22);
+  --brand-gradient:  linear-gradient(135deg,#6d7cff,#9b6bff,#c084fc);
+  --brand-glow:      rgba(109,124,255,0.22);
 
   --success:    #34d399;  --success-bg: rgba(52,211,153,.1);  --success-b: rgba(52,211,153,.25);
   --warning:    #fbbf24;  --warning-bg: rgba(251,191,36,.1);  --warning-b: rgba(251,191,36,.25);
-  --error:      #f87171;  --error-bg:   rgba(248,113,113,.1);
+  --error:      #fb7185;  --error-bg:   rgba(251,113,133,.1);
   --info:       #60a5fa;  --info-bg:    rgba(96,165,250,.1);  --info-b:    rgba(96,165,250,.25);
 
   --emerald: #34d399; --emerald-bg: rgba(52,211,153,.12);
   --blue:    #60a5fa; --blue-bg:    rgba(96,165,250,.12);
   --purple:  #a78bfa; --purple-bg:  rgba(167,139,250,.12);
   --amber:   #fbbf24; --amber-bg:   rgba(251,191,36,.12);
-  --red:     #f87171; --red-bg:     rgba(248,113,113,.12);
+  --red:     #fb7185; --red-bg:     rgba(251,113,133,.12);
   --indigo:  #818cf8; --indigo-bg:  rgba(129,140,248,.12);
 
   --r-sm:  6px;  --r-md: 12px;  --r-lg: 18px;
@@ -44,7 +44,7 @@
   --shadow-md:  0 4px 16px rgba(0,0,0,.5);
   --shadow-lg:  0 8px 32px rgba(0,0,0,.6);
   --shadow-xl:  0 20px 60px rgba(0,0,0,.7);
-  --shadow-glow:0 0 40px rgba(109,126,255,.14);
+  --shadow-glow:0 0 40px rgba(109,124,255,.14);
 
   --ease:  cubic-bezier(.4,0,.2,1);
   --spring:cubic-bezier(.34,1.56,.64,1);
@@ -53,8 +53,8 @@
   --t-slow:350ms var(--ease);
   --t-spring:400ms var(--spring);
 
-  --font-display:'Syne',sans-serif;
-  --font-body:'DM Sans',sans-serif;
+  --font-display: var(--font-display-google, 'Syne'), system-ui, sans-serif;
+  --font-body: var(--font-sans-google, 'DM Sans'), system-ui, sans-serif;
 }
 
 /* ── RESET ── */

@@ -25,8 +25,22 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  // Apply saved appearance before first paint to avoid a flash of the wrong theme.
+  const noFlash = `(function(){try{var d=document.documentElement;var a=JSON.parse(localStorage.getItem('finflow:appearance')||'{}');d.setAttribute('data-mode',a.darkMode===false?'light':'dark');d.setAttribute('data-theme',a.theme||'default');d.setAttribute('data-font-size',a.fontSize||'medium');d.setAttribute('data-density',a.compactView?'compact':'comfortable');if(a.language)d.setAttribute('lang',a.language);}catch(e){}})();`;
+
   return (
-    <html lang="en" className={`${dmSans.variable} ${syne.variable}`}>
+    <html
+      lang="en"
+      className={`${dmSans.variable} ${syne.variable}`}
+      data-mode="dark"
+      data-theme="default"
+      data-font-size="medium"
+      data-density="comfortable"
+      suppressHydrationWarning
+    >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: noFlash }} />
+      </head>
       <body>
         <Providers>{children}</Providers>
       </body>

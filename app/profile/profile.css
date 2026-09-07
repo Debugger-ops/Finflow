@@ -2,25 +2,25 @@
 
 /* ===== ROOT VARIABLES ===== */
 :root {
-  --primary-color: #6366f1;
-  --primary-hover: #4f46e5;
-  --secondary-color: #8b5cf6;
-  --danger-color: #ef4444;
-  --danger-hover: #dc2626;
-  --success-color: #10b981;
-  --warning-color: #f59e0b;
+  --primary-color: #6d7cff;
+  --primary-hover: #5b6af7;
+  --secondary-color: #9b6bff;
+  --danger-color: #fb7185;
+  --danger-hover: #e11d48;
+  --success-color: #34d399;
+  --warning-color: #fbbf24;
   
-  --bg-primary: #0f172a;
-  --bg-secondary: #1e293b;
-  --bg-tertiary: #334155;
-  --bg-hover: #475569;
+  --bg-primary: #11162a;
+  --bg-secondary: #161d34;
+  --bg-tertiary: #1d2542;
+  --bg-hover: #243056;
   
-  --text-primary: #f1f5f9;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
+  --text-primary: #eef1fb;
+  --text-secondary: #9aa6cc;
+  --text-muted: #5f6a92;
   
-  --border-color: #334155;
-  --border-hover: #475569;
+  --border-color: #1d2542;
+  --border-hover: #243056;
   
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3);

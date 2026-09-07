@@ -1,24 +1,24 @@
 :root {
-  --primary      : #6366f1;
-  --primary-dark : #4f46e5;
-  --secondary    : #8b5cf6;
-  --accent       : #f59e0b;
-  --success      : #10b981;
-  --danger       : #ef4444;
-  --background   : #0f0f23;
-  --surface      : #1a1a2e;
-  --surface-light: #252547;
-  --border       : #2d2d5f;
-  --text         : #ffffff;
-  --text-muted   : #a1a1aa;
-  --text-subtle  : #71717a;
+  --primary      : #6d7cff;
+  --primary-dark : #5b6af7;
+  --secondary    : #9b6bff;
+  --accent       : #fbbf24;
+  --success      : #34d399;
+  --danger       : #fb7185;
+  --background   : #0b0f1d;
+  --surface      : #11162a;
+  --surface-light: #161d34;
+  --border       : #1d2542;
+  --text         : #eef1fb;
+  --text-muted   : #9aa6cc;
+  --text-subtle  : #5f6a92;
 
-  --brand-primary: #0ea5e9;
-  --brand-mid    : #6366f1;
-  --brand-end    : #8b5cf6;
+  --brand-primary: #38bdf8;
+  --brand-mid    : #6d7cff;
+  --brand-end    : #9b6bff;
 
-  --ff-display: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --ff-body   : 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --ff-display: var(--font-display-google, 'Syne'), system-ui, sans-serif;
+  --ff-body   : var(--font-sans-google, 'DM Sans'), system-ui, sans-serif;
 
   --radius-sm: 8px;
   --radius-md: 12px;

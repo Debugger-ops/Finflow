@@ -8,24 +8,25 @@
 /* ── Variables ──────────────────────────────────────────── */
 :root {
   /* Background layers */
-  --bg:       #08050f;
-  --bg-2:     #0f0b1a;
-  --bg-3:     #150f22;
-  --bg-4:     #1e1630;
-  --glass:    rgba(139,92,246,0.04);
-  --glass-hv: rgba(139,92,246,0.08);
-  --glass-bd: rgba(139,92,246,0.15);
-  --glass-act:rgba(139,92,246,0.28);
+  --bg:       #060912;
+  --bg-2:     #0b0f1d;
+  --bg-3:     #11162a;
+  --bg-4:     #161d34;
+  --glass:    rgba(109,124,255,0.04);
+  --glass-hv: rgba(109,124,255,0.08);
+  --glass-bd: rgba(109,124,255,0.15);
+  --glass-act:rgba(109,124,255,0.28);
 
   /* Accent — electric purple */
-  --ac:        #a855f7;
+  --ac:        #9b6bff;
   --ac-bright: #c084fc;
-  --ac-dim:    rgba(168,85,247,0.12);
-  --ac-glow:   rgba(168,85,247,0.28);
-  --ac-press:  #9333ea;
+  --ac-dim:    rgba(155,107,255,0.12);
+  --ac-glow:   rgba(155,107,255,0.28);
+  --ac-press:  #7c3aed;
 
   /* Secondary accent — vivid violet */
   --violet:     #7c3aed;
+  --av:         #9b6bff;
   --violet-dim: rgba(124,58,237,0.12);
 
   /* Tertiary — rose-pink pop */
@@ -37,17 +38,17 @@
   --blue-dim: rgba(129,140,248,0.10);
 
   /* Status */
-  --danger:      #f87171;
-  --danger-dim:  rgba(248,113,113,0.12);
+  --danger:      #fb7185;
+  --danger-dim:  rgba(251,113,133,0.12);
   --warn:        #fb923c;
   --warn-dim:    rgba(251,146,60,0.12);
   --ok:          #a3e635;
   --ok-dim:      rgba(163,230,53,0.12);
 
   /* Text */
-  --t1: #f0eaff;
-  --t2: #9b8ec4;
-  --t3: #4b3d6e;
+  --t1: #eef1fb;
+  --t2: #9aa6cc;
+  --t3: #5f6a92;
 
   /* Radii */
   --r1: 8px;

@@ -3,40 +3,40 @@
 /* CSS Variables for Dark Mode */
 :root {
   /* Background Colors */
-  --notif-bg-primary: #0a0e27;
-  --notif-bg-secondary: #131728;
-  --notif-bg-card: #1a1f3a;
-  --notif-bg-hover: #252b47;
+  --notif-bg-primary: #060912;
+  --notif-bg-secondary: #0b0f1d;
+  --notif-bg-card: #11162a;
+  --notif-bg-hover: #1d2542;
   --notif-backdrop: rgba(0, 0, 0, 0.5);
   
   /* Text Colors */
-  --notif-text-primary: #ffffff;
-  --notif-text-secondary: #a0aec0;
-  --notif-text-muted: #6b7280;
+  --notif-text-primary: #eef1fb;
+  --notif-text-secondary: #9aa6cc;
+  --notif-text-muted: #5f6a92;
   
   /* Border Colors */
-  --notif-border-color: #2d3555;
+  --notif-border-color: #1d2542;
   --notif-border-light: rgba(255, 255, 255, 0.05);
   
   /* Status Colors */
-  --notif-success: #10b981;
+  --notif-success: #34d399;
   --notif-success-bg: rgba(16, 185, 129, 0.1);
   --notif-success-border: rgba(16, 185, 129, 0.3);
   
-  --notif-warning: #f59e0b;
+  --notif-warning: #fbbf24;
   --notif-warning-bg: rgba(245, 158, 11, 0.1);
   --notif-warning-border: rgba(245, 158, 11, 0.3);
   
-  --notif-info: #3b82f6;
-  --notif-info-bg: rgba(59, 130, 246, 0.1);
-  --notif-info-border: rgba(59, 130, 246, 0.3);
+  --notif-info: #6d7cff;
+  --notif-info-bg: rgba(109, 124, 255, 0.1);
+  --notif-info-border: rgba(109, 124, 255, 0.3);
   
-  --notif-error: #ef4444;
+  --notif-error: #fb7185;
   --notif-error-bg: rgba(239, 68, 68, 0.1);
   --notif-error-border: rgba(239, 68, 68, 0.3);
   
   /* Brand Colors */
-  --notif-primary: #6366f1;
+  --notif-primary: #6d7cff;
   --notif-primary-hover: #5558e3;
   
   /* Spacing */
@@ -44,6 +44,7 @@
   --notif-spacing-sm: 0.5rem;
   --notif-spacing-md: 1rem;
   --notif-spacing-lg: 1.5rem;
+  --notif-spacing-xl: 2rem;
   
   /* Border Radius */
   --notif-radius-sm: 0.5rem;

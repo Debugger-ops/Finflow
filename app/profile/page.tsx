@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import './profile.css';
 import { useRouter } from "next/navigation";
+import { applyAppearance } from '../libs/appearance';
 
 interface UserProfile {
   name: string;
@@ -174,14 +175,31 @@ const parseDateFromDisplay = (displayDate: string) => {
     try {
       setLoading(true);
       
-      // Load all settings in parallel
-      const [notificationsRes, privacyRes, appearanceRes, activityRes, sessionsRes] = await Promise.all([
+      // Load core profile + all settings in parallel
+      const [profileRes, notificationsRes, privacyRes, appearanceRes, activityRes, sessionsRes] = await Promise.all([
+        fetch('/api/profile'),
         fetch('/api/profile/notifications'),
         fetch('/api/profile/privacy'),
         fetch('/api/profile/appearance'),
         fetch('/api/profile/activity'),
         fetch('/api/profile/sessions')
       ]);
+
+      // Populate the core profile fields (name, bio, phone, socials, …) from the DB.
+      // Without this the saved values never reload and edits appear not to persist.
+      if (profileRes.ok) {
+        const data = await profileRes.json();
+        if (data.success && data.data) {
+          setProfile((prev) => ({
+            ...prev,
+            ...data.data,
+            // Keep falsy DB values as empty strings so inputs stay controlled.
+            name: data.data.name ?? prev.name ?? '',
+            email: data.data.email ?? prev.email ?? '',
+            image: data.data.image ?? prev.image ?? '',
+          }));
+        }
+      }
 
       if (notificationsRes.ok) {
         const data = await notificationsRes.json();
@@ -209,6 +227,7 @@ const parseDateFromDisplay = (displayDate: string) => {
         const data = await appearanceRes.json();
         if (data.success) {
           setAppearance(data.data);
+          applyAppearance(data.data); // reflect saved look in the live UI
         }
       }
 
@@ -367,6 +386,7 @@ const parseDateFromDisplay = (displayDate: string) => {
   const handleAppearanceChange = async (key: string, value: any) => {
     const newAppearance = { ...appearance, [key]: value };
     setAppearance(newAppearance);
+    applyAppearance(newAppearance); // apply instantly (and cache) before the save round-trips
 
     // Save to backend
     try {

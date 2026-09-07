@@ -10,39 +10,39 @@
 }
 
    :root {
-  --ink-950  : #020408;
-  --ink-900  : #060b14;
-  --ink-800  : #0b1221;
-  --ink-700  : #101a2e;
-  --ink-600  : #16243f;
-  --ink-400  : #2a3f5f;
-  --ink-200  : #3d5a80;
+  --ink-950  : #04060d;
+  --ink-900  : #060912;
+  --ink-800  : #0b0f1d;
+  --ink-700  : #11162a;
+  --ink-600  : #161d34;
+  --ink-400  : #2a3350;
+  --ink-200  : #3d4a6b;
 
-  --slate-500: #4a6280;
-  --slate-400: #647d9e;
-  --slate-300: #8fa3be;
-  --slate-200: #b8c8da;
-  --slate-100: #dce6f0;
-  --white    : #f0f6ff;
+  --slate-500: #5f6a92;
+  --slate-400: #7a86ad;
+  --slate-300: #9aa6cc;
+  --slate-200: #c2cce4;
+  --slate-100: #dde5f3;
+  --white    : #eef1fb;
 
-  --cyan-400 : #00d4ff;
-  --cyan-300 : #38e5ff;
-  --gold-400 : #f5c842;
-  --gold-300 : #fbd96a;
-  --green-400: #00e5a0;
-  --red-400  : #ff4d6a;
+  --cyan-400 : #38bdf8;
+  --cyan-300 : #67d3fb;
+  --gold-400 : #fbbf24;
+  --gold-300 : #fcd34d;
+  --green-400: #34d399;
+  --red-400  : #fb7185;
 
-  --ff-display: 'Cabinet Grotesk', sans-serif;
-  --ff-serif  : 'Instrument Serif', serif;
-  --ff-mono   : 'JetBrains Mono', monospace;
+  --ff-display: var(--font-display-google, 'Syne'), system-ui, sans-serif;
+  --ff-serif  : Georgia, 'Times New Roman', serif;
+  --ff-mono   : ui-monospace, 'SF Mono', Menlo, monospace;
 
-  --grad-primary  : linear-gradient(135deg, var(--cyan-400) 0%, #3b82f6 50%, #8b5cf6 100%);
+  --grad-primary  : linear-gradient(135deg, var(--cyan-400) 0%, #6d7cff 50%, #9b6bff 100%);
   --grad-gold     : linear-gradient(135deg, var(--gold-400), var(--gold-300));
-  --grad-hero-glow: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(0,212,255,0.14) 0%, transparent 65%);
+  --grad-hero-glow: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(56,189,248,0.14) 0%, transparent 65%);
 
   --border-dim   : rgba(255 255 255 / .055);
   --border-subtle: rgba(255 255 255 / .09);
-  --border-cyan  : rgba(0, 212, 255, 0.22);
+  --border-cyan  : rgba(56, 189, 248, 0.22);
 
   --r-xs: 4px;
   --r-sm: 8px;

@@ -6,25 +6,25 @@
    DESIGN TOKENS
    ============================================= */
 :root {
-  --bg-base:        #03050f;
-  --bg-surface:     #080d1c;
-  --bg-card:        #0c1225;
-  --bg-card-alt:    #101830;
-  --bg-hover:       #151f38;
-  --bg-active:      #1a2645;
+  --bg-base:        #060912;
+  --bg-surface:     #0b0f1d;
+  --bg-card:        #11162a;
+  --bg-card-alt:    #161d34;
+  --bg-hover:       #1d2542;
+  --bg-active:      #243056;
 
-  --text-primary:   #e8eeff;
-  --text-secondary: #7d8ab5;
-  --text-muted:     #3e4a6b;
-  --text-inverse:   #03050f;
+  --text-primary:   #eef1fb;
+  --text-secondary: #9aa6cc;
+  --text-muted:     #5f6a92;
+  --text-inverse:   #060912;
 
-  --brand:          #4f7cff;
-  --brand-light:    #7ba3ff;
-  --brand-dim:      rgba(79,124,255,0.12);
-  --brand-border:   rgba(79,124,255,0.25);
-  --brand-glow:     0 0 40px rgba(79,124,255,0.18);
+  --brand:          #6d7cff;
+  --brand-light:    #a5b4fc;
+  --brand-dim:      rgba(109,124,255,0.12);
+  --brand-border:   rgba(109,124,255,0.25);
+  --brand-glow:     0 0 40px rgba(109,124,255,0.18);
 
-  --accent-cyan:    #22d3ee;
+  --accent-cyan:    #38bdf8;
   --accent-violet:  #a78bfa;
 
   --positive:        #34d399;
@@ -70,8 +70,8 @@
   --t-slow:   350ms cubic-bezier(.4,0,.2,1);
   --t-spring: 400ms cubic-bezier(.34,1.56,.64,1);
 
-  --font-display: 'Clash Display', sans-serif;
-  --font-body:    'Cabinet Grotesk', sans-serif;
+  --font-display: var(--font-display-google, 'Syne'), system-ui, sans-serif;
+  --font-body: var(--font-sans-google, 'DM Sans'), system-ui, sans-serif;
 }
 
 /* =============================================

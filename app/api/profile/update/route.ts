@@ -1,10 +1,8 @@
-'use server';
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '../../auth/[...nextauth]/route';
+import { authOptions } from '../../../libs/auth';
 import { connectDB } from '../../../libs/mongoConnect';
-import User from '../../../models/User'
-import Transaction from "../../../models/Transaction";
+import User from '../../../models/User';
 import { z, ZodError } from 'zod';
 import { logActivity } from '../../../libs/activity-logger';
 
@@ -29,6 +27,7 @@ const profileUpdateSchema = z.object({
   github: z.string().optional().nullable(),
   linkedin: z.string().optional().nullable(),
   twitter: z.string().optional().nullable(),
+  instagram: z.string().optional().nullable(),
 });
 
 
