@@ -1,0 +1,207 @@
+/* ============================================================================
+   FinFlow — Canonical design tokens (single source of truth)
+   ----------------------------------------------------------------------------
+   Every page used to declare its own :root with slightly different colors,
+   which is why the UI felt inconsistent. These tokens are the shared system.
+   To adopt them in a page, delete that page's local :root block — it will then
+   inherit everything below. Names match the de-facto set already used by
+   dashboard.css so existing pages keep working during the migration.
+   ============================================================================ */
+
+:root {
+  /* ---- Surfaces (dark theme) ---- */
+  --bg-primary:    #060912;
+  --bg-secondary:  #0b0f1d;
+  --bg-card:       #11162a;
+  --bg-card-2:     #161d34;
+  --bg-hover:      #1d2542;
+  --bg-glass:      rgba(255, 255, 255, 0.03);
+
+  /* ---- Text ---- */
+  --text-primary:   #eef1fb;
+  --text-secondary: #9aa6c9;
+  --text-muted:     #5b648c;
+  --text-accent:    #a5b4fc;
+
+  /* ---- Borders ---- */
+  --border:        rgba(255, 255, 255, 0.08);
+  --border-bright: rgba(165, 180, 252, 0.22);
+
+  /* ---- Brand ---- */
+  --brand:          #6d7cff;
+  --brand-2:        #a78bfa;
+  --brand-gradient: linear-gradient(135deg, #6d7cff, #9b6bff, #c084fc);
+  --brand-glow:     rgba(109, 126, 255, 0.22);
+
+  /* ---- Semantic ---- */
+  --success: #34d399; --success-bg: rgba(52, 211, 153, 0.10); --success-b: rgba(52, 211, 153, 0.25);
+  --warning: #fbbf24; --warning-bg: rgba(251, 191, 36, 0.10); --warning-b: rgba(251, 191, 36, 0.25);
+  --error:   #fb7185; --error-bg:   rgba(251, 113, 133, 0.10); --error-b:  rgba(251, 113, 133, 0.25);
+  --info:    #60a5fa; --info-bg:    rgba(96, 165, 250, 0.10);  --info-b:   rgba(96, 165, 250, 0.25);
+
+  /* ---- Accent palette (charts, tags) ---- */
+  --emerald: #34d399; --blue: #60a5fa; --purple: #a78bfa;
+  --amber:   #fbbf24; --red:  #fb7185; --indigo: #818cf8;
+
+  /* ---- Radius ---- */
+  --r-sm: 6px; --r-md: 12px; --r-lg: 18px; --r-xl: 24px; --r-2xl: 32px;
+  --radius: var(--r-lg);
+
+  /* ---- Spacing scale ---- */
+  --space-1: 4px;  --space-2: 8px;  --space-3: 12px; --space-4: 16px;
+  --space-5: 24px; --space-6: 32px; --space-8: 48px;
+
+  /* ---- Elevation ---- */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 0 1px var(--border-bright), 0 12px 40px var(--brand-glow);
+
+  /* ---- Typography (wired to next/font in layout.tsx) ---- */
+  --font-sans:    var(--font-sans-google, "DM Sans"), system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  --font-display: var(--font-display-google, 'Syne'), system-ui, sans-serif;
+
+  /* ---- Motion ---- */
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur: 200ms;
+}
+
+/* ============================================================================
+   Reusable component primitives — opt-in classes so screens look consistent.
+   ============================================================================ */
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 10px 18px; border-radius: var(--r-md); border: 1px solid transparent;
+  font: 600 0.95rem/1 var(--font-sans); cursor: pointer;
+  transition: transform var(--dur) var(--ease), background var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.btn:active { transform: translateY(1px); }
+.btn-primary { background: var(--brand-gradient); color: #fff; box-shadow: 0 8px 24px var(--brand-glow); }
+.btn-primary:hover { filter: brightness(1.07); }
+.btn-ghost { background: var(--bg-glass); color: var(--text-primary); border-color: var(--border); }
+.btn-ghost:hover { background: var(--bg-hover); border-color: var(--border-bright); }
+
+.card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--r-lg); box-shadow: var(--shadow-md);
+}
+
+.input {
+  width: 100%; padding: 11px 14px; border-radius: var(--r-md);
+  background: var(--bg-secondary); border: 1px solid var(--border);
+  color: var(--text-primary); font: 400 0.95rem/1.4 var(--font-sans);
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.input::placeholder { color: var(--text-muted); }
+.input:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-glow); }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 3px 10px; border-radius: 999px; font: 600 0.78rem/1 var(--font-sans);
+  border: 1px solid var(--border);
+}
+.badge-success { color: var(--success); background: var(--success-bg); border-color: var(--success-b); }
+.badge-warning { color: var(--warning); background: var(--warning-bg); border-color: var(--warning-b); }
+.badge-error   { color: var(--error);   background: var(--error-bg);   border-color: var(--error-b); }
+
+/* ============================================================================
+   Modern polish — applied app-wide. Low-risk additive rules only.
+   ============================================================================ */
+
+/* Subtle brand depth behind every page (shows through transparent layouts). */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 50% at 50% -8%, rgba(109, 124, 255, 0.10), transparent 70%),
+    radial-gradient(45% 40% at 100% 0%, rgba(167, 139, 250, 0.06), transparent 70%);
+}
+
+/* Refined interactive feel for the shared primitives. */
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 10px 30px var(--brand-glow); }
+.card { transition: transform var(--dur) var(--ease), border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease); }
+.card:hover { border-color: var(--border-bright); box-shadow: var(--shadow-lg); }
+
+/* ============================================================================
+   APPEARANCE SETTINGS — driven by data-* attributes on <html>.
+   Set by app/libs/appearance.ts (AppearanceSync + the profile page).
+   [data-mode] dark|light  ·  [data-theme] default|blue|green|purple
+   [data-font-size] small|medium|large|xlarge  ·  [data-density] comfortable|compact
+   The attribute selectors outrank each page's plain :root, so these win app-wide.
+   ============================================================================ */
+
+/* ---- Theme Color: re-tint the brand everywhere ---- */
+:root[data-theme="blue"] {
+  --brand: #3b82f6; --brand-2: #22d3ee;
+  --brand-gradient: linear-gradient(135deg, #3b82f6, #38bdf8, #22d3ee);
+  --brand-glow: rgba(59, 130, 246, 0.22);
+  --text-accent: #7dd3fc; --border-bright: rgba(59, 130, 246, 0.30);
+}
+:root[data-theme="green"] {
+  --brand: #10b981; --brand-2: #34d399;
+  --brand-gradient: linear-gradient(135deg, #059669, #10b981, #34d399);
+  --brand-glow: rgba(16, 185, 129, 0.22);
+  --text-accent: #6ee7b7; --border-bright: rgba(16, 185, 129, 0.30);
+}
+:root[data-theme="purple"] {
+  --brand: #a855f7; --brand-2: #c084fc;
+  --brand-gradient: linear-gradient(135deg, #9333ea, #a855f7, #c084fc);
+  --brand-glow: rgba(168, 85, 247, 0.22);
+  --text-accent: #d8b4fe; --border-bright: rgba(168, 85, 247, 0.30);
+}
+
+/* ---- Font Size: scales rem-based sizing + base text across the app ---- */
+:root[data-font-size="small"]  { font-size: 14.5px; }
+:root[data-font-size="medium"] { font-size: 16px; }
+:root[data-font-size="large"]  { font-size: 17.5px; }
+:root[data-font-size="xlarge"] { font-size: 19.5px; }
+
+/* ---- Compact density: tighten the shared spacing tokens ---- */
+:root[data-density="compact"] {
+  --space-1: 3px; --space-2: 6px; --space-3: 9px; --space-4: 12px;
+  --space-5: 18px; --space-6: 24px; --space-8: 36px;
+  --sp-xs: .18rem; --sp-sm: .375rem; --sp-md: .7rem; --sp-lg: 1.05rem; --sp-xl: 1.4rem; --sp-2xl: 1.9rem;
+  --s-xs: .18rem; --s-sm: .375rem; --s-md: .7rem; --s-lg: 1.05rem; --s-xl: 1.4rem; --s-2xl: 1.9rem;
+}
+
+/* ---- Light mode: flip the surface/text/border tokens (brand stays) ---- */
+:root[data-mode="light"] {
+  /* surfaces */
+  --bg-primary: #f4f6fc; --bg: #f4f6fc; --bg-base: #f4f6fc; --background: #f4f6fc;
+  --bg-secondary: #ffffff; --bg-surface: #ffffff; --surface: #ffffff; --bg-2: #ffffff;
+  --bg-card: #ffffff; --bg-3: #ffffff; --notif-bg-secondary: #ffffff;
+  --bg-card-2: #eef1f8; --bg-card-alt: #eef1f8; --bg-4: #eef1f8; --surface-light: #eef1f8;
+  --notif-bg-primary: #f4f6fc; --notif-bg-card: #ffffff;
+  --bg-hover: #e6ebf5; --bg-active: #dde4f1; --bg-tertiary: #e6ebf5; --notif-bg-hover: #e6ebf5;
+  --bg-glass: rgba(15, 23, 42, 0.03); --glass: rgba(15, 23, 42, 0.03);
+  --glass-hv: rgba(15, 23, 42, 0.06); --glass-bd: rgba(15, 23, 42, 0.12); --glass-act: rgba(109, 124, 255, 0.16);
+  /* landing ink ramp -> light */
+  --ink-950: #ffffff; --ink-900: #f4f6fc; --ink-800: #ffffff; --ink-700: #eef1f8;
+  --ink-600: #e6ebf5; --ink-400: #c7d0e4; --ink-200: #aab6d2;
+  /* text -> dark */
+  --text-primary: #0c1020; --text: #0c1020; --t1: #0c1020; --notif-text-primary: #0c1020; --white: #0c1020; --slate-100: #0c1020;
+  --text-secondary: #44506e; --t2: #44506e; --notif-text-secondary: #44506e; --slate-200: #2c3753; --slate-300: #44506e;
+  --text-muted: #6b7799; --t3: #6b7799; --notif-text-muted: #6b7799; --slate-400: #6b7799;
+  --text-subtle: #8793b3; --slate-500: #8793b3;
+  --text-inverse: #ffffff;
+  /* borders */
+  --border: rgba(12, 16, 32, 0.10); --notif-border-color: rgba(12, 16, 32, 0.10);
+  --border-color: rgba(12, 16, 32, 0.12); --border-hover: rgba(12, 16, 32, 0.20);
+  --border-dim: rgba(12, 16, 32, 0.06); --border-subtle: rgba(12, 16, 32, 0.10);
+  --border-bright: rgba(109, 124, 255, 0.40);
+  /* softer shadows on light */
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 6px 18px rgba(15, 23, 42, 0.10);
+  --shadow-lg: 0 16px 40px rgba(15, 23, 42, 0.14);
+  --shadow-xl: 0 24px 60px rgba(15, 23, 42, 0.18);
+}
+/* Dial back the dark-mode brand glow on light backgrounds. */
+:root[data-mode="light"] body::before {
+  background:
+    radial-gradient(60% 50% at 50% -8%, rgba(109, 124, 255, 0.06), transparent 70%),
+    radial-gradient(45% 40% at 100% 0%, rgba(167, 139, 250, 0.04), transparent 70%);
+}

@@ -1,61 +1,9 @@
 /* ── FONTS ── */
 
 /* ── VARIABLES ── */
-:root {
-  --bg-primary:      #060912;
-  --bg-secondary:    #0b0f1d;
-  --bg-card:         #11162a;
-  --bg-card-2:       #161d34;
-  --bg-hover:        #1d2542;
-  --bg-glass:        rgba(255,255,255,0.03);
-
-  --text-primary:    #eef1fb;
-  --text-secondary:  #9aa6cc;
-  --text-muted:      #5f6a92;
-  --text-accent:     #a5b4fc;
-
-  --border:          rgba(255,255,255,0.065);
-  --border-bright:   rgba(165,180,252,0.22);
-
-  --brand:           #6d7cff;
-  --brand-2:         #a78bfa;
-  --brand-gradient:  linear-gradient(135deg,#6d7cff,#9b6bff,#c084fc);
-  --brand-glow:      rgba(109,124,255,0.22);
-
-  --success:    #34d399;  --success-bg: rgba(52,211,153,.1);  --success-b: rgba(52,211,153,.25);
-  --warning:    #fbbf24;  --warning-bg: rgba(251,191,36,.1);  --warning-b: rgba(251,191,36,.25);
-  --error:      #fb7185;  --error-bg:   rgba(251,113,133,.1);
-  --info:       #60a5fa;  --info-bg:    rgba(96,165,250,.1);  --info-b:    rgba(96,165,250,.25);
-
-  --emerald: #34d399; --emerald-bg: rgba(52,211,153,.12);
-  --blue:    #60a5fa; --blue-bg:    rgba(96,165,250,.12);
-  --purple:  #a78bfa; --purple-bg:  rgba(167,139,250,.12);
-  --amber:   #fbbf24; --amber-bg:   rgba(251,191,36,.12);
-  --red:     #fb7185; --red-bg:     rgba(251,113,133,.12);
-  --indigo:  #818cf8; --indigo-bg:  rgba(129,140,248,.12);
-
-  --r-sm:  6px;  --r-md: 12px;  --r-lg: 18px;
-  --r-xl:  24px; --r-2xl:32px;
-
-  --sp-xs:.25rem; --sp-sm:.5rem; --sp-md:1rem;
-  --sp-lg:1.5rem; --sp-xl:2rem;  --sp-2xl:2.75rem;
-
-  --shadow-sm:  0 1px 4px rgba(0,0,0,.5);
-  --shadow-md:  0 4px 16px rgba(0,0,0,.5);
-  --shadow-lg:  0 8px 32px rgba(0,0,0,.6);
-  --shadow-xl:  0 20px 60px rgba(0,0,0,.7);
-  --shadow-glow:0 0 40px rgba(109,124,255,.14);
-
-  --ease:  cubic-bezier(.4,0,.2,1);
-  --spring:cubic-bezier(.34,1.56,.64,1);
-  --t-fast:120ms var(--ease);
-  --t-base:200ms var(--ease);
-  --t-slow:350ms var(--ease);
-  --t-spring:400ms var(--spring);
-
-  --font-display: var(--font-display-google, 'Syne'), system-ui, sans-serif;
-  --font-body: var(--font-sans-google, 'DM Sans'), system-ui, sans-serif;
-}
+/* Design tokens now come from app/styles/theme.css (imported by globals.css).
+   The page-local :root block was removed so Appearance settings — light mode,
+   theme colour, font size, density — reach this screen too. */
 
 /* ── RESET ── */
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
@@ -545,4 +493,105 @@ button:focus-visible{outline:2px solid var(--brand);outline-offset:2px;}
   .balance-stats{grid-template-columns:1fr;}
   .stats-row{grid-template-columns:1fr 1fr;}
   .balance-right-col{display:none;}
+}
+
+/* ============================================================================
+   Additions for the shared-nav / live-data dashboard.
+   ============================================================================ */
+
+/* The container had a max-width but no auto margin, so it hugged the left edge
+   on wide displays. */
+.dashboard-container{width:100%;max-width:var(--shell-max);margin-inline:auto;padding-inline:var(--shell-pad);}
+
+/* Section switcher (moved out of the old page header). */
+.section-tabs{
+  display:flex;gap:.35rem;padding:.3rem;align-self:flex-start;max-width:100%;
+  background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-lg);
+  overflow-x:auto;scrollbar-width:none;
+}
+.section-tabs::-webkit-scrollbar{display:none;}
+.section-tab{
+  flex:0 0 auto;padding:.5rem 1.1rem;border:0;border-radius:var(--r-md);background:none;
+  color:var(--text-secondary);font:600 .85rem/1 var(--font-sans);cursor:pointer;
+  transition:background var(--dur) var(--ease),color var(--dur) var(--ease);
+}
+.section-tab:hover{color:var(--text-primary);}
+.section-tab.active{background:var(--brand-dim);color:var(--text-primary);box-shadow:inset 0 0 0 1px var(--brand-border);}
+
+/* Data-load failure banner. */
+.data-banner{
+  display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;
+  padding:.75rem 1rem;border-radius:var(--r-md);
+  background:var(--warning-bg);border:1px solid var(--warning-b);color:var(--warning);
+  font-size:.85rem;
+}
+.data-banner button{
+  margin-left:auto;display:inline-flex;align-items:center;gap:.35rem;
+  padding:.35rem .75rem;border-radius:var(--r-sm);cursor:pointer;
+  background:transparent;border:1px solid var(--warning-b);color:var(--warning);
+  font:600 .78rem/1 var(--font-sans);
+}
+
+/* Empty states now that the lists are real and can be empty. */
+.empty-state{
+  padding:1.6rem 1rem;margin:0;text-align:center;
+  color:var(--text-muted);font-size:.85rem;line-height:1.5;
+}
+.link-btn{
+  background:none;border:0;padding:0;cursor:pointer;
+  color:var(--text-accent);font:600 .85rem/1.5 var(--font-sans);text-decoration:underline;
+}
+
+.balance-change-pill.neg{color:var(--error);}
+.balance-badge.neg{color:var(--error);}
+.mini-card-tag{
+  margin-left:auto;padding:.1rem .45rem;border-radius:999px;
+  background:rgba(255,255,255,.18);font-size:.6rem;font-weight:700;letter-spacing:.04em;
+}
+.mini-card.is-frozen{opacity:.6;}
+
+/* ── Responsive hardening ─────────────────────────────────────────────────── */
+
+/* Charts: recharts' ResponsiveContainer needs a parent that is allowed to
+   shrink, otherwise the grid column blows out on small screens. */
+.charts-grid,.main-grid,.stats-row,.insights-grid,.balance-stats,.quick-actions{min-width:0;}
+.chart-card,.card,.stat-card,.left-col,.right-sidebar{min-width:0;}
+
+/* Long merchant names / amounts must not push a row sideways. */
+.transaction-details h4,.inv-details h4,.crypto-info h4,.budget-name,.category-name,.goal-name{
+  min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.transaction-item,.investment-item,.crypto-item{gap:.75rem;}
+.transaction-left,.inv-details,.crypto-info{min-width:0;}
+.transaction-amount,.inv-value,.crypto-value{flex-shrink:0;white-space:nowrap;}
+
+@media(max-width:1024px){
+  /* Sparkline column is decoration; the numbers matter more at this width. */
+  .inv-mini-line{display:none;}
+}
+
+@media(max-width:768px){
+  .welcome-heading{font-size:1.4rem;}
+  .section-tabs{align-self:stretch;}
+  .section-tab{flex:1 1 0;text-align:center;padding:.55rem .5rem;}
+  .insights-grid{grid-template-columns:1fr;}
+  .card-header{flex-wrap:wrap;gap:.5rem;}
+  .period-tabs{width:100%;overflow-x:auto;scrollbar-width:none;}
+  .period-tabs::-webkit-scrollbar{display:none;}
+}
+
+@media(max-width:480px){
+  .dashboard-container{gap:1.1rem;}
+  .welcome-actions{width:100%;}
+  .welcome-actions button{flex:1 1 0;justify-content:center;}
+  .quick-actions{grid-template-columns:repeat(2,1fr);}
+  .stat-card{padding:var(--sp-md);}
+  .balance-amount{font-size:1.7rem;}
+  .transaction-meta{flex-wrap:wrap;}
+}
+
+/* Very small phones (≤360px): one column everywhere rather than cramped pairs. */
+@media(max-width:360px){
+  .stats-row{grid-template-columns:1fr;}
+  .quick-actions{grid-template-columns:1fr;}
 }

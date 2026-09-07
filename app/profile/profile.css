@@ -1,39 +1,9 @@
 /* profile.css */
 
 /* ===== ROOT VARIABLES ===== */
-:root {
-  --primary-color: #6d7cff;
-  --primary-hover: #5b6af7;
-  --secondary-color: #9b6bff;
-  --danger-color: #fb7185;
-  --danger-hover: #e11d48;
-  --success-color: #34d399;
-  --warning-color: #fbbf24;
-  
-  --bg-primary: #11162a;
-  --bg-secondary: #161d34;
-  --bg-tertiary: #1d2542;
-  --bg-hover: #243056;
-  
-  --text-primary: #eef1fb;
-  --text-secondary: #9aa6cc;
-  --text-muted: #5f6a92;
-  
-  --border-color: #1d2542;
-  --border-hover: #243056;
-  
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
-  
-  --radius-sm: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
-  
-  --transition: all 0.2s ease;
-}
+/* Design tokens now come from app/styles/theme.css (imported by globals.css).
+   The page-local :root block was removed so Appearance settings — light mode,
+   theme colour, font size, density — reach this screen too. */
 
 /* ===== GLOBAL RESETS ===== */
 * {
@@ -152,7 +122,7 @@
   padding: 1.5rem;
   height: fit-content;
   position: sticky;
-  top: 2rem;
+  top: calc(var(--topnav-h) + 1rem);
   box-shadow: var(--shadow-md);
 }
 

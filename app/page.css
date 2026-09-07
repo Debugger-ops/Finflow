@@ -8,57 +8,9 @@
   padding: 0;
 }
 
-:root {
-  --ink-950  : #04060d;
-  --ink-900  : #060912;
-  --ink-800  : #0b0f1d;
-  --ink-700  : #11162a;
-  --ink-600  : #161d34;
-  --ink-400  : #2a3350;
-  --ink-200  : #3d4a6b;
-
-  --slate-500: #5f6a92;
-  --slate-400: #7a86ad;
-  --slate-300: #9aa6cc;
-  --slate-200: #c2cce4;
-  --slate-100: #dde5f3;
-  --white    : #eef1fb;
-
-  --cyan-400 : #38bdf8;
-  --cyan-300 : #67d3fb;
-  --cyan-200 : #9ce0fc;
-  --cyan-glow: rgba(56, 189, 248, 0.18);
-
-  --gold-400 : #fbbf24;
-  --gold-300 : #fcd34d;
-
-  --green-400: #34d399;
-  --red-400  : #fb7185;
-
-  --ff-display: var(--font-display-google, 'Syne'), system-ui, sans-serif;
-  --ff-serif  : Georgia, 'Times New Roman', serif;
-  --ff-mono   : ui-monospace, 'SF Mono', Menlo, monospace;
-
-  --grad-primary  : linear-gradient(135deg, var(--cyan-400) 0%, #6d7cff 50%, #9b6bff 100%);
-  --grad-gold     : linear-gradient(135deg, var(--gold-400), var(--gold-300));
-  --grad-hero-glow: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(56,189,248,0.14) 0%, transparent 65%);
-  --grad-cta-glow : radial-gradient(ellipse 70% 80% at 50% 50%, rgba(109,124,255,0.12) 0%, transparent 65%);
-
-  --border-dim   : rgba(255 255 255 / .055);
-  --border-subtle: rgba(255 255 255 / .09);
-  --border-cyan  : rgba(56, 189, 248, 0.22);
-  --border-gold  : rgba(245, 200, 66, 0.22);
-
-  --r-xs: 4px;
-  --r-sm: 8px;
-  --r-md: 14px;
-  --r-lg: 22px;
-  --r-xl: 32px;
-
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease    : cubic-bezier(0.4, 0, 0.2, 1);
-  --spring  : cubic-bezier(0.34, 1.56, 0.64, 1);
-}
+/* Design tokens now come from app/styles/theme.css (imported by globals.css).
+   The page-local :root block was removed so Appearance settings — light mode,
+   theme colour, font size, density — reach this screen too. */
 
 /* ============================================================
    ROOT WRAPPER

@@ -5,67 +5,9 @@
 /* =============================================
    DESIGN TOKENS
    ============================================= */
-:root {
-  --bg-base:        #060912;
-  --bg-surface:     #0b0f1d;
-  --bg-card:        #11162a;
-  --bg-card-alt:    #161d34;
-  --bg-hover:       #1d2542;
-
-  --text-primary:   #eef1fb;
-  --text-secondary: #9aa6cc;
-  --text-muted:     #5f6a92;
-
-  --brand:          #6d7cff;
-  --brand-light:    #a5b4fc;
-  --brand-dim:      rgba(109,124,255,0.12);
-  --brand-border:   rgba(109,124,255,0.25);
-
-  --accent-cyan:    #38bdf8;
-  --accent-violet:  #a78bfa;
-
-  --positive:        #34d399;
-  --positive-bg:     rgba(52,211,153,0.1);
-  --positive-border: rgba(52,211,153,0.22);
-  --negative:        #fb7185;
-  --negative-bg:     rgba(251,113,133,0.1);
-  --negative-border: rgba(251,113,133,0.22);
-  --warning:         #fbbf24;
-  --warning-bg:      rgba(251,191,36,0.1);
-  --warning-border:  rgba(251,191,36,0.25);
-  --info:            #60a5fa;
-  --info-bg:         rgba(96,165,250,0.1);
-  --info-border:     rgba(96,165,250,0.25);
-
-  --border:          rgba(255,255,255,0.06);
-  --border-bright:   rgba(255,255,255,0.12);
-
-  --r-sm:  0.5rem;
-  --r-md:  0.875rem;
-  --r-lg:  1.25rem;
-  --r-xl:  1.75rem;
-  --r-2xl: 2.5rem;
-
-  --s-xs: 0.25rem;
-  --s-sm: 0.5rem;
-  --s-md: 1rem;
-  --s-lg: 1.5rem;
-  --s-xl: 2rem;
-  --s-2xl:3rem;
-
-  --shadow-sm: 0 1px 4px rgba(0,0,0,0.5);
-  --shadow-md: 0 4px 16px rgba(0,0,0,0.55);
-  --shadow-lg: 0 8px 32px rgba(0,0,0,0.65);
-  --shadow-xl: 0 20px 60px rgba(0,0,0,0.7);
-
-  --t-fast:   120ms cubic-bezier(.4,0,.2,1);
-  --t-base:   200ms cubic-bezier(.4,0,.2,1);
-  --t-slow:   350ms cubic-bezier(.4,0,.2,1);
-  --t-spring: 420ms cubic-bezier(.34,1.56,.64,1);
-
-  --font-display: var(--font-display-google, 'Syne'), system-ui, sans-serif;
-  --font-body: var(--font-sans-google, 'DM Sans'), system-ui, sans-serif;
-}
+/* Design tokens now come from app/styles/theme.css (imported by globals.css).
+   The page-local :root block was removed so Appearance settings — light mode,
+   theme colour, font size, density — reach this screen too. */
 
 /* =============================================
    RESET & BASE
@@ -124,7 +66,8 @@ button:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
   -webkit-backdrop-filter: blur(20px) saturate(160%);
   border-bottom: 1px solid var(--border);
   position: sticky;
-  top: 0;
+  /* below the shared AppNav, which is also sticky at the top */
+  top: var(--topnav-h);
   z-index: 100;
 }
 .rpt-header::after {
@@ -836,4 +779,51 @@ button:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
   .rpt-two-col      { grid-template-columns: 1fr 1fr; }
   .rpt-three-col    { grid-template-columns: repeat(3,1fr); }
   .rpt-insights-row { grid-template-columns: repeat(3,1fr); }
+}
+/* ============================================================================
+   Live-report additions (banners, empty states) + responsive hardening.
+   ============================================================================ */
+
+.rpt-main { padding-inline: var(--shell-pad); max-width: var(--shell-max); }
+
+.rpt-banner {
+  display: flex; align-items: center; gap: .6rem; flex-wrap: wrap;
+  padding: .8rem 1rem; border-radius: var(--r-md);
+  background: var(--warning-bg); border: 1px solid var(--warning-border); color: var(--warning);
+  font-size: .875rem;
+}
+.rpt-banner.info {
+  background: var(--info-bg); border-color: var(--info-border); color: var(--info);
+}
+.rpt-banner button {
+  margin-left: auto; display: inline-flex; align-items: center; gap: .35rem;
+  min-height: 36px; padding: 0 .8rem; border-radius: var(--r-sm); cursor: pointer;
+  background: transparent; border: 1px solid currentColor; color: inherit;
+  font: 600 .78rem/1 var(--font-body);
+}
+
+.rpt-empty {
+  padding: 1.5rem 1rem; margin: 0; text-align: center;
+  color: var(--text-muted); font-size: .85rem;
+}
+
+/* Recharts needs shrinkable parents or the grid column overflows on phones. */
+.rpt-card, .rpt-kpi-card, .rpt-two-col, .rpt-three-col, .rpt-kpi-row { min-width: 0; }
+.rpt-merchant-info, .rpt-budget-label { min-width: 0; }
+.rpt-merchant-info h4, .rpt-budget-label span {
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .rpt-period-tabs { width: 100%; overflow-x: auto; scrollbar-width: none; }
+  .rpt-period-tabs::-webkit-scrollbar { display: none; }
+  .rpt-export-btn { min-height: 42px; }
+  .rpt-legend, .rpt-legend-sm { flex-wrap: wrap; }
+  .rpt-card-header { flex-wrap: wrap; gap: .5rem; }
+}
+
+@media (max-width: 480px) {
+  .rpt-banner { font-size: .8rem; }
+  .rpt-banner button { margin-left: 0; width: 100%; justify-content: center; }
+  .rpt-pie-legend { grid-template-columns: 1fr; }
 }

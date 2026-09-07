@@ -1,97 +1,101 @@
+// app/api/goals/[id]/route.ts
+// Every handler is scoped to { _id, userId } so one account can never read or
+// mutate another account's goal (previously all of these took the id alone).
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth/next";
+import mongoose from "mongoose";
+import { authOptions } from "../../../libs/auth";
 import { connectDB } from "../../../libs/mongoConnect";
 import Goal, { IGoal } from "../../../models/Goal";
-import mongoose from "mongoose";
+import { log } from "../../../libs/logger";
 
-// app/api/goals/[id]/route.ts (PATCH/PUT)
-export async function PATCH(
-  req: Request,
-  context: { params: Promise<{ id: string }> }
-) {
+const logger = log("goals/[id]");
+
+async function guard(id: string) {
+  const session = await getServerSession(authOptions);
+  const userId = (session?.user as any)?.id as string | undefined;
+  if (!userId) return { error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
+  if (!mongoose.Types.ObjectId.isValid(id))
+    return { error: NextResponse.json({ error: "Invalid goal ID" }, { status: 400 }) };
+  await connectDB();
+  return { userId };
+}
+
+const notFound = () => NextResponse.json({ error: "Goal not found" }, { status: 404 });
+
+/* ---------------- GET one ---------------- */
+export async function GET(_req: Request, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
-  await connectDB();
+  const g = await guard(id);
+  if (g.error) return g.error;
 
-  const body = await req.json();
-
-  // Only increment current if provided
-  const update: any = {};
-  if (body.current !== undefined) update.$inc = { current: Number(body.current) };
-
-  const updatedGoal = await Goal.findByIdAndUpdate(id, update, { new: true }).lean();
-  if (!updatedGoal) return NextResponse.json({ error: "Goal not found" }, { status: 404 });
-
-  return NextResponse.json({ ...updatedGoal, id: updatedGoal._id.toString() });
+  const goal = await Goal.findOne({ _id: id, userId: g.userId }).lean<IGoal>();
+  if (!goal) return notFound();
+  return NextResponse.json({ ...goal, id: String(goal._id) });
 }
 
-/* ---------------- GET single goal ---------------- */
-export async function GET(
-  req: Request,
-  context: { params: Promise<{ id: string }> }
-) {
-  const { id } = await context.params; // unwrap params
+/* ---------------- PATCH (increment progress) ---------------- */
+export async function PATCH(req: Request, context: { params: Promise<{ id: string }> }) {
+  const { id } = await context.params;
+  const g = await guard(id);
+  if (g.error) return g.error;
 
-  await connectDB();
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return NextResponse.json({ error: "Invalid goal ID" }, { status: 400 });
+  const body = await req.json().catch(() => ({}));
+  if (body.current === undefined) {
+    return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
+  }
+  const delta = Number(body.current);
+  if (!Number.isFinite(delta)) {
+    return NextResponse.json({ error: "`current` must be a number" }, { status: 400 });
   }
 
-  const goal = await Goal.findById(id).lean<IGoal>();
-  if (!goal) {
-    return NextResponse.json({ error: "Goal not found" }, { status: 404 });
-  }
+  const updated = await Goal.findOneAndUpdate(
+    { _id: id, userId: g.userId },
+    { $inc: { current: delta } },
+    { new: true },
+  ).lean<IGoal>();
+  if (!updated) return notFound();
 
-  return NextResponse.json({ ...goal, id: goal._id.toString() });
+  return NextResponse.json({ ...updated, id: String(updated._id) });
 }
 
-/* ---------------- UPDATE goal ---------------- */
-export async function PUT(
-  req: Request,
-  context: { params: Promise<{ id: string }> }
-) {
-  const { id } = await context.params; // unwrap params
+/* ---------------- PUT (full update) ---------------- */
+export async function PUT(req: Request, context: { params: Promise<{ id: string }> }) {
+  const { id } = await context.params;
+  const g = await guard(id);
+  if (g.error) return g.error;
 
-  await connectDB();
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return NextResponse.json({ error: "Invalid goal ID" }, { status: 400 });
-  }
-
-  const body = await req.json();
+  const body = await req.json().catch(() => ({}));
+  // Ownership is never client-settable.
+  delete body.userId;
+  delete body._id;
 
   if (body.target !== undefined) body.target = Number(body.target);
   if (body.current !== undefined) body.current = Number(body.current);
-  if (body.monthlyContribution !== undefined)
-    body.monthlyContribution = Number(body.monthlyContribution);
+  if (body.monthlyContribution !== undefined) body.monthlyContribution = Number(body.monthlyContribution);
   if (body.deadline) body.deadline = new Date(body.deadline);
 
-  await Goal.findByIdAndUpdate(id, body, { runValidators: true });
-
-  const updatedGoal = await Goal.findById(id).lean<IGoal>();
-  if (!updatedGoal) {
-    return NextResponse.json({ error: "Goal not found" }, { status: 404 });
+  try {
+    const updated = await Goal.findOneAndUpdate(
+      { _id: id, userId: g.userId },
+      body,
+      { new: true, runValidators: true },
+    ).lean<IGoal>();
+    if (!updated) return notFound();
+    return NextResponse.json({ ...updated, id: String(updated._id) });
+  } catch (err) {
+    logger.error({ err }, "goal update failed");
+    return NextResponse.json({ error: "Failed to update goal" }, { status: 400 });
   }
-
-  return NextResponse.json({ ...updatedGoal, id: updatedGoal._id.toString() });
 }
 
-/* ---------------- DELETE goal ---------------- */
-export async function DELETE(
-  req: Request,
-  context: { params: Promise<{ id: string }> }
-) {
-  const { id } = await context.params; // unwrap params
+/* ---------------- DELETE ---------------- */
+export async function DELETE(_req: Request, context: { params: Promise<{ id: string }> }) {
+  const { id } = await context.params;
+  const g = await guard(id);
+  if (g.error) return g.error;
 
-  await connectDB();
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return NextResponse.json({ error: "Invalid goal ID" }, { status: 400 });
-  }
-
-  const deletedGoal = await Goal.findByIdAndDelete(id).lean<IGoal>();
-  if (!deletedGoal) {
-    return NextResponse.json({ error: "Goal not found" }, { status: 404 });
-  }
-
+  const deleted = await Goal.findOneAndDelete({ _id: id, userId: g.userId }).lean<IGoal>();
+  if (!deleted) return notFound();
   return NextResponse.json({ success: true });
 }

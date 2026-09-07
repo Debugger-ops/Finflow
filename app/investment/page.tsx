@@ -70,29 +70,18 @@ interface Toast {
 // ─────────────────────────────────────────────
 // Static data (defined outside component to avoid re-creation)
 // ─────────────────────────────────────────────
-const BASE_STOCKS: Stock[] = [
-  { symbol: 'AAPL',  name: 'Apple Inc.',       price: 178.42, change:  2.35, changePercent:  1.33, shares: 50, value:  8_921.00, dayHigh: 179.85, dayLow: 176.20, volume: '52.3M', targetPrice: 185, stopLoss: 170 },
-  { symbol: 'MSFT',  name: 'Microsoft Corp.',  price: 412.78, change:  5.67, changePercent:  1.39, shares: 25, value: 10_319.50, dayHigh: 415.20, dayLow: 409.50, volume: '23.1M', targetPrice: 430, stopLoss: 400 },
-  { symbol: 'GOOGL', name: 'Alphabet Inc.',    price: 141.80, change: -1.20, changePercent: -0.84, shares: 40, value:  5_672.00, dayHigh: 143.50, dayLow: 141.00, volume: '18.7M', targetPrice: 150, stopLoss: 135 },
-  { symbol: 'TSLA',  name: 'Tesla Inc.',       price: 248.50, change:  8.90, changePercent:  3.71, shares: 30, value:  7_455.00, dayHigh: 252.00, dayLow: 242.30, volume: '95.2M', targetPrice: 260, stopLoss: 230 },
-  { symbol: 'NVDA',  name: 'NVIDIA Corp.',     price: 875.28, change: 12.45, changePercent:  1.44, shares: 15, value: 13_129.20, dayHigh: 880.00, dayLow: 868.50, volume: '41.5M', targetPrice: 900, stopLoss: 850 },
-  { symbol: 'AMZN',  name: 'Amazon.com Inc.',  price: 178.25, change: -2.15, changePercent: -1.19, shares: 35, value:  6_238.75, dayHigh: 181.00, dayLow: 177.50, volume: '35.8M', targetPrice: 190, stopLoss: 170 },
-];
-
-const PORTFOLIO_HOLDINGS: Portfolio[] = [
-  { name: 'US Stocks',     value: 18_500, change: 850, changePercent: 4.8, allocation: 57, color: 'emerald', icon: TrendingUp  },
-  { name: 'Cryptocurrency',value:  8_200, change: 320, changePercent: 4.1, allocation: 25, color: 'amber',   icon: Globe       },
-  { name: 'Bonds',         value:  3_750, change:  45, changePercent: 1.2, allocation: 12, color: 'blue',    icon: DollarSign  },
-  { name: 'ETFs',          value:  2_000, change:  30, changePercent: 1.5, allocation:  6, color: 'purple',  icon: PieIcon     },
-];
-
-const RECENT_TRANSACTIONS: Transaction[] = [
-  { id: 1, type: 'buy',      symbol: 'AAPL',  name: 'Apple Inc.',      amount:  -8_910.00, shares: 50, price: 178.20, date: '2024-02-05', time: '09:30 AM' },
-  { id: 2, type: 'dividend', symbol: 'MSFT',  name: 'Microsoft Corp.', amount:     125.50,                             date: '2024-02-04', time: '12:00 PM' },
-  { id: 3, type: 'sell',     symbol: 'TSLA',  name: 'Tesla Inc.',      amount:   2_485.00, shares: 10, price: 248.50, date: '2024-02-03', time: '02:15 PM' },
-  { id: 4, type: 'buy',      symbol: 'NVDA',  name: 'NVIDIA Corp.',    amount:  -4_376.40, shares:  5, price: 875.28, date: '2024-02-02', time: '10:45 AM' },
-  { id: 5, type: 'dividend', symbol: 'AAPL',  name: 'Apple Inc.',      amount:      48.50,                             date: '2024-02-01', time: '12:00 PM' },
-];
+// Holdings, allocation and activity all come from the API now:
+//   /api/portfolio → real positions priced live
+//   /api/prices    → refreshed quotes for the symbols actually held
+//   /api/orders    → the user's real buy/sell history
+// The old module-level arrays invented share counts and trades, which is
+// especially misleading in a money app because the prices around them are real.
+const ASSET_CLASS_META: Record<string, { name: string; color: string; icon: React.ElementType }> = {
+  stock:  { name: 'Stocks',         color: 'emerald', icon: TrendingUp  },
+  crypto: { name: 'Cryptocurrency', color: 'amber',   icon: Globe       },
+  etf:    { name: 'ETFs',           color: 'purple',  icon: PieIcon     },
+  bond:   { name: 'Bonds',          color: 'blue',    icon: DollarSign  },
+};
 
 const PIE_COLORS: Record<string, string> = {
   emerald: '#34d399',
@@ -223,7 +212,9 @@ const OverviewView: React.FC<{
   router: ReturnType<typeof useRouter>;
   onViewHoldings: () => void;
   onViewTransactions: () => void;
-}> = ({ stocks, router, onViewHoldings, onViewTransactions }) => (
+  allocation: Portfolio[];
+  activity: Transaction[];
+}> = ({ stocks, router, onViewHoldings, onViewTransactions, allocation, activity }) => (
   <div className="overview-grid">
 
     {/* Allocation */}
@@ -235,11 +226,11 @@ const OverviewView: React.FC<{
       <div className="allocation-chart">
         <ResponsiveContainer width="100%" height={220}>
           <PieChart>
-            <Pie data={PORTFOLIO_HOLDINGS} dataKey="allocation" nameKey="name"
+            <Pie data={allocation} dataKey="allocation" nameKey="name"
               cx="50%" cy="50%" outerRadius={75} innerRadius={40} paddingAngle={3} stroke="none"
-              label={({ index }) => `${PORTFOLIO_HOLDINGS[index!].allocation}%`}
+              label={({ index }) => `${allocation[index!].allocation}%`}
               labelLine={false}>
-              {PORTFOLIO_HOLDINGS.map((h, i) => (
+              {allocation.map((h, i) => (
                 <Cell key={i} fill={PIE_COLORS[h.color]} />
               ))}
             </Pie>
@@ -250,7 +241,10 @@ const OverviewView: React.FC<{
         </ResponsiveContainer>
       </div>
       <div className="allocation-list">
-        {PORTFOLIO_HOLDINGS.map((h, i) => (
+        {allocation.length === 0 && (
+          <p className="inv-empty">Nothing invested yet — your allocation appears once you hold an asset.</p>
+        )}
+        {allocation.map((h, i) => (
           <div key={i} className="allocation-item">
             <div className="allocation-header">
               <div className="allocation-left">
@@ -335,7 +329,8 @@ const OverviewView: React.FC<{
         <button className="text-btn" onClick={onViewTransactions}>View All <ChevronRight size={14} /></button>
       </div>
       <div className="activity-list">
-        {RECENT_TRANSACTIONS.slice(0, 5).map((tx) => (
+        {activity.length === 0 && <p className="inv-empty">No trades yet.</p>}
+        {activity.slice(0, 5).map((tx) => (
           <ActivityItem key={tx.id} tx={tx} />
         ))}
       </div>
@@ -442,7 +437,7 @@ const HoldingsView: React.FC<{
 };
 
 // ── Transactions Tab ──
-const TransactionsView: React.FC = () => (
+const TransactionsView: React.FC<{ transactions: Transaction[] }> = ({ transactions }) => (
   <div className="transactions-view">
     <div className="transactions-header">
       <div className="transactions-filters" role="group" aria-label="Filter transactions">
@@ -462,7 +457,10 @@ const TransactionsView: React.FC = () => (
         ))}
       </div>
       <div className="table-body">
-        {RECENT_TRANSACTIONS.map((tx) => (
+        {transactions.length === 0 && (
+          <p className="inv-empty">No orders yet. Buy or sell an asset and it shows up here.</p>
+        )}
+        {transactions.map((tx) => (
           <div key={tx.id} className="table-row" role="row">
             <div className="table-cell type-cell" role="cell">
               <div className={`type-badge ${tx.type}`}>
@@ -519,7 +517,11 @@ const Investments: React.FC = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [searchQuery, setSearchQuery]   = useState('');
   const [filterType, setFilterType]     = useState<'all'|'stocks'|'crypto'|'etfs'|'bonds'>('all');
-  const [liveStocks, setLiveStocks]     = useState<Stock[]>(BASE_STOCKS);
+  const [liveStocks, setLiveStocks]     = useState<Stock[]>([]);
+  const [allocation, setAllocation]     = useState<Portfolio[]>([]);
+  const [activity, setActivity]         = useState<Transaction[]>([]);
+  const [costBasis, setCostBasis]       = useState(0);
+  const [loadingPortfolio, setLoadingPortfolio] = useState(true);
   const [toasts, setToasts]             = useState<Toast[]>([]);
 
   // Dismiss toast
@@ -541,31 +543,114 @@ const Investments: React.FC = () => {
     if (status === 'unauthenticated') router.push('/login');
   }, [status, router]);
 
-  // Live price polling
+  // Real positions + real order history.
+  const loadPortfolio = useCallback(async () => {
+    try {
+      const [pfRes, ordersRes] = await Promise.all([
+        fetch('/api/portfolio'),
+        fetch('/api/orders?limit=25'),
+      ]);
+
+      if (pfRes.ok) {
+        const json = await pfRes.json();
+        if (json?.success) {
+          const positions = json.data.positions ?? [];
+          setCostBasis(json.data.totals?.costBasis ?? 0);
+
+          setLiveStocks(positions.map((pos: any) => ({
+            symbol: pos.symbol,
+            name: pos.name || pos.symbol,
+            price: pos.price,
+            change: pos.price - pos.avgCost,
+            changePercent: pos.unrealizedPLPercent,
+            shares: pos.shares,
+            value: pos.marketValue,
+          })));
+
+          // Allocation is grouped by asset class from the same positions.
+          const byClass: Record<string, { value: number; cost: number }> = {};
+          for (const pos of positions) {
+            const key = ASSET_CLASS_META[pos.assetType] ? pos.assetType : 'stock';
+            byClass[key] ??= { value: 0, cost: 0 };
+            byClass[key].value += pos.marketValue;
+            byClass[key].cost  += pos.costBasis;
+          }
+          const totalValue = Object.values(byClass).reduce((s, v) => s + v.value, 0);
+          setAllocation(Object.entries(byClass).map(([key, v]) => {
+            const meta = ASSET_CLASS_META[key];
+            const change = v.value - v.cost;
+            return {
+              name: meta.name,
+              value: Math.round(v.value * 100) / 100,
+              change: Math.round(change * 100) / 100,
+              changePercent: v.cost ? Math.round((change / v.cost) * 1000) / 10 : 0,
+              allocation: totalValue ? Math.round((v.value / totalValue) * 100) : 0,
+              color: meta.color,
+              icon: meta.icon,
+            } as Portfolio;
+          }));
+        }
+      }
+
+      if (ordersRes.ok) {
+        const json = await ordersRes.json();
+        if (json?.success) {
+          setActivity((json.data ?? []).map((o: any, i: number) => {
+            const d = new Date(o.createdAt);
+            return {
+              id: i + 1,
+              type: o.type,
+              symbol: o.symbol,
+              name: o.name,
+              amount: o.type === 'buy' ? -o.total : o.total,
+              shares: o.shares,
+              price: o.price,
+              date: d.toISOString().slice(0, 10),
+              time: d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+            } as Transaction;
+          }));
+        }
+      }
+    } catch {
+      /* leave whatever is on screen; the empty states explain it */
+    } finally {
+      setLoadingPortfolio(false);
+    }
+  }, []);
+
   useEffect(() => {
+    if (status !== 'authenticated') return;
+    loadPortfolio();
+  }, [status, loadPortfolio]);
+
+  // Refresh quotes for the symbols actually held.
+  useEffect(() => {
+    if (liveStocks.length === 0) return;
+    const symbols = liveStocks.map((s) => s.symbol).join(',');
+
     const fetchPrices = async () => {
-      const symbols = BASE_STOCKS.map((s) => s.symbol).join(',');
       try {
         const res  = await fetch(`/api/prices?symbols=${symbols}`);
+        if (!res.ok) return;
         const data = await res.json();
-        setLiveStocks(
-          BASE_STOCKS.map((stock) => ({
+        setLiveStocks((prev) => prev.map((stock) => {
+          const quote = data[stock.symbol];
+          if (!quote?.price) return stock;
+          return {
             ...stock,
-            price:         data[stock.symbol]?.price         ?? stock.price,
-            change:        data[stock.symbol]?.change        ?? stock.change,
-            changePercent: data[stock.symbol]?.changePercent ?? stock.changePercent,
-            value: stock.shares
-              ? stock.shares * (data[stock.symbol]?.price ?? stock.price)
-              : stock.value,
-          }))
-        );
-      } catch { /* keep existing prices on error */ }
+            price: quote.price,
+            changePercent: quote.changePercent ?? stock.changePercent,
+            value: stock.shares ? stock.shares * quote.price : stock.value,
+          };
+        }));
+      } catch { /* keep the last good prices */ }
     };
 
-    fetchPrices();
-    const id = setInterval(fetchPrices, 10_000);
+    const id = setInterval(fetchPrices, 15_000);
     return () => clearInterval(id);
-  }, []);
+    // Re-arm only when the set of held symbols changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [liveStocks.map((s) => s.symbol).join(',')]);
 
   // Price alerts
   useEffect(() => {
@@ -588,9 +673,9 @@ const Investments: React.FC = () => {
 
   // Derived values
   const investmentValue          = liveStocks.reduce((sum, s) => sum + (s.value ?? 0), 0);
-  const totalInvested            = 28_500;
+  const totalInvested            = costBasis;
   const investmentChange         = investmentValue - totalInvested;
-  const investmentChangePercent  = (investmentChange / totalInvested) * 100;
+  const investmentChangePercent  = totalInvested > 0 ? (investmentChange / totalInvested) * 100 : 0;
 
   const performanceMetrics: PerformanceMetric[] = [
     {
@@ -746,6 +831,8 @@ const Investments: React.FC = () => {
         {activeView === 'overview' && (
           <OverviewView
             stocks={liveStocks}
+            allocation={allocation}
+            activity={activity}
             router={router}
             onViewHoldings={() => setActiveView('holdings')}
             onViewTransactions={() => setActiveView('transactions')}
@@ -763,7 +850,7 @@ const Investments: React.FC = () => {
           />
         )}
 
-        {activeView === 'transactions' && <TransactionsView />}
+        {activeView === 'transactions' && <TransactionsView transactions={activity} />}
       </main>
 
     </div>

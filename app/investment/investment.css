@@ -5,74 +5,9 @@
 /* =============================================
    DESIGN TOKENS
    ============================================= */
-:root {
-  --bg-base:        #060912;
-  --bg-surface:     #0b0f1d;
-  --bg-card:        #11162a;
-  --bg-card-alt:    #161d34;
-  --bg-hover:       #1d2542;
-  --bg-active:      #243056;
-
-  --text-primary:   #eef1fb;
-  --text-secondary: #9aa6cc;
-  --text-muted:     #5f6a92;
-  --text-inverse:   #060912;
-
-  --brand:          #6d7cff;
-  --brand-light:    #a5b4fc;
-  --brand-dim:      rgba(109,124,255,0.12);
-  --brand-border:   rgba(109,124,255,0.25);
-  --brand-glow:     0 0 40px rgba(109,124,255,0.18);
-
-  --accent-cyan:    #38bdf8;
-  --accent-violet:  #a78bfa;
-
-  --positive:        #34d399;
-  --positive-bg:     rgba(52,211,153,0.1);
-  --positive-border: rgba(52,211,153,0.22);
-  --negative:        #fb7185;
-  --negative-bg:     rgba(251,113,133,0.1);
-  --negative-border: rgba(251,113,133,0.22);
-  --warning:         #fbbf24;
-  --warning-bg:      rgba(251,191,36,0.1);
-  --info:            #60a5fa;
-  --info-bg:         rgba(96,165,250,0.1);
-
-  --c-emerald: #34d399;
-  --c-amber:   #fbbf24;
-  --c-blue:    #60a5fa;
-  --c-purple:  #a78bfa;
-  --c-red:     #fb7185;
-
-  --border:        rgba(255,255,255,0.06);
-  --border-bright: rgba(255,255,255,0.12);
-
-  --r-sm:  0.5rem;
-  --r-md:  0.875rem;
-  --r-lg:  1.25rem;
-  --r-xl:  1.75rem;
-  --r-2xl: 2.5rem;
-
-  --s-xs: 0.25rem;
-  --s-sm: 0.5rem;
-  --s-md: 1rem;
-  --s-lg: 1.5rem;
-  --s-xl: 2rem;
-  --s-2xl:3rem;
-
-  --shadow-sm: 0 1px 4px rgba(0,0,0,0.5);
-  --shadow-md: 0 4px 16px rgba(0,0,0,0.55);
-  --shadow-lg: 0 8px 32px rgba(0,0,0,0.65);
-  --shadow-xl: 0 20px 60px rgba(0,0,0,0.7);
-
-  --t-fast:   120ms cubic-bezier(.4,0,.2,1);
-  --t-base:   200ms cubic-bezier(.4,0,.2,1);
-  --t-slow:   350ms cubic-bezier(.4,0,.2,1);
-  --t-spring: 400ms cubic-bezier(.34,1.56,.64,1);
-
-  --font-display: var(--font-display-google, 'Syne'), system-ui, sans-serif;
-  --font-body: var(--font-sans-google, 'DM Sans'), system-ui, sans-serif;
-}
+/* Design tokens now come from app/styles/theme.css (imported by globals.css).
+   The page-local :root block was removed so Appearance settings — light mode,
+   theme colour, font size, density — reach this screen too. */
 
 /* =============================================
    RESET & BASE
@@ -166,7 +101,7 @@ input  { font-family: var(--font-body); border: none; outline: none; background:
   border: 1px solid var(--brand-border);
   border-left: 3px solid var(--brand);
   border-radius: var(--r-lg);
-  box-shadow: var(--shadow-xl), var(--brand-glow);
+  box-shadow: var(--shadow-xl), 0 0 40px var(--brand-glow);
   animation: toast-in 0.3s var(--t-spring);
 }
 @keyframes toast-in {
@@ -240,7 +175,7 @@ input  { font-family: var(--font-body); border: none; outline: none; background:
   border-radius: var(--r-xl); padding: var(--s-xl) var(--s-2xl);
   display: flex; flex-direction: column; gap: var(--s-xl);
   position: relative; overflow: hidden;
-  box-shadow: var(--brand-glow); isolation: isolate;
+  box-shadow: 0 0 40px var(--brand-glow); isolation: isolate;
 }
 .portfolio-summary-card::before {
   content: ''; position: absolute; inset: 0;
@@ -770,4 +705,37 @@ input  { font-family: var(--font-body); border: none; outline: none; background:
   .transactions-table-card { background: white; border: 1px solid #d1d5db; box-shadow: none; break-inside: avoid; }
   .overview-grid { grid-template-columns: 1fr; }
   .performance-metrics { grid-template-columns: repeat(2,1fr); }
+}
+
+/* ── Live-portfolio additions + responsive hardening ── */
+.investments-container, .investments-page { padding-inline: var(--shell-pad); max-width: var(--shell-max); margin-inline: auto; }
+
+.inv-empty {
+  grid-column: 1 / -1;
+  padding: 1.75rem 1rem; margin: 0; text-align: center;
+  color: var(--text-muted); font-size: .85rem; line-height: 1.5;
+}
+
+/* Recharts + grid children need to be allowed to shrink. */
+.overview-grid, .allocation-card, .activity-card, .holdings-view,
+.transactions-view, .performance-metrics { min-width: 0; }
+
+/* The transactions table scrolls sideways instead of stretching the page. */
+.transactions-table-card { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.transactions-table-card .table-header,
+.transactions-table-card .table-row { min-width: 620px; }
+
+.holding-name, .allocation-name, .activity-name {
+  min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .investments-header .header-actions { width: 100%; flex-wrap: wrap; }
+  .investments-header .header-actions > * { flex: 1 1 auto; min-height: 44px; }
+  .transactions-filters { width: 100%; overflow-x: auto; scrollbar-width: none; }
+  .transactions-filters::-webkit-scrollbar { display: none; }
+  .filter-btn, .export-btn { min-height: 44px; }
+}
+@media (max-width: 480px) {
+  .performance-metrics { grid-template-columns: 1fr 1fr; }
 }

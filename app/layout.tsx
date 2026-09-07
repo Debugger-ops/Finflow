@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Syne, DM_Sans } from "next/font/google";
 import "../globals.css";
 import { Providers } from "./providers";
@@ -22,6 +22,19 @@ const syne = Syne({
 export const metadata: Metadata = {
   title: "FinFlow",
   description: "Personal finance, investing, and payments.",
+};
+
+// viewportFit: "cover" is what makes env(safe-area-inset-*) resolve on iOS, so
+// the fixed mobile tab bar clears the home indicator. maximumScale is left
+// unset deliberately — blocking pinch-zoom is an accessibility failure.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)",  color: "#060912" },
+    { media: "(prefers-color-scheme: light)", color: "#f4f6fc" },
+  ],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

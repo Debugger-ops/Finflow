@@ -58,19 +58,19 @@
   justify-content: center;
   cursor: pointer;
   transition: all 0.15s ease;
-  color: #718096;
+  color: var(--text-secondary);
   border-radius: 6px;
 }
 
 .closeButton:hover {
-  background: #f7fafc;
-  color: #2d3748;
+  background: var(--bg-card-2);
+  color: var(--bg-card-2);
 }
 
 .title {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #1a202c;
+  color: var(--bg-card);
   margin: 0 0 1.25rem 0;
   padding-right: 2rem;
 }
@@ -83,7 +83,7 @@
   display: block;
   font-size: 0.813rem;
   font-weight: 500;
-  color: #4a5568;
+  color: var(--text-secondary);
   margin-bottom: 0.5rem;
 }
 
@@ -91,7 +91,7 @@
   width: 100%;
   padding: 0.75rem 0.875rem;
   font-size: 1rem;
-  border: 1.5px solid #e2e8f0;
+  border: 1.5px solid var(--border);
   border-radius: 8px;
   transition: all 0.15s ease;
   box-sizing: border-box;
@@ -100,12 +100,12 @@
 
 .input:focus {
   outline: none;
-  border-color: #5b68ee;
+  border-color: var(--brand-border);
   box-shadow: 0 0 0 3px rgba(91, 104, 238, 0.1);
 }
 
 .input::placeholder {
-  color: #cbd5e0;
+  color: var(--text-muted);
 }
 
 .input::-webkit-outer-spin-button,
@@ -119,12 +119,12 @@
 }
 
 .error {
-  background: #fff5f5;
-  color: #c53030;
+  background: var(--error-bg);
+  color: var(--error);
   font-size: 0.813rem;
   padding: 0.625rem 0.875rem;
   border-radius: 6px;
-  border-left: 3px solid #fc8181;
+  border-left: 3px solid var(--error-b);
   margin-bottom: 1rem;
 }
 
@@ -148,16 +148,16 @@
 }
 
 .submitButton {
-  background: #5b68ee;
+  background: var(--brand);
   color: white;
 }
 
 .submitButton:hover:not(:disabled) {
-  background: #4a56d9;
+  background: var(--brand);
 }
 
 .submitButton:active:not(:disabled) {
-  background: #3d47c2;
+  background: var(--brand);
 }
 
 .submitButton:disabled {
@@ -166,13 +166,13 @@
 }
 
 .cancelButton {
-  background: #f7fafc;
-  color: #4a5568;
-  border: 1.5px solid #e2e8f0;
+  background: var(--bg-card-2);
+  color: var(--text-secondary);
+  border: 1.5px solid var(--border);
 }
 
 .cancelButton:hover:not(:disabled) {
-  background: #edf2f7;
+  background: var(--bg-card-2);
 }
 
 .cancelButton:disabled {

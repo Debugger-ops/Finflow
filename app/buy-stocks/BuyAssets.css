@@ -5,61 +5,9 @@
 /* =============================================
    DESIGN TOKENS
    ============================================= */
-:root {
-  --bg-base:        #060912;
-  --bg-surface:     #0b0f1d;
-  --bg-card:        #11162a;
-  --bg-card-alt:    #161d34;
-  --bg-hover:       #1d2542;
-
-  --text-primary:   #eef1fb;
-  --text-secondary: #9aa6cc;
-  --text-muted:     #5f6a92;
-
-  --brand:          #6d7cff;
-  --brand-light:    #a5b4fc;
-  --brand-dim:      rgba(109,124,255,0.12);
-  --brand-border:   rgba(109,124,255,0.25);
-  --brand-glow:     0 0 40px rgba(109,124,255,0.18);
-
-  --accent-cyan:    #38bdf8;
-  --accent-violet:  #a78bfa;
-
-  --positive:        #34d399;
-  --positive-bg:     rgba(52,211,153,0.1);
-  --positive-border: rgba(52,211,153,0.22);
-  --negative:        #fb7185;
-  --negative-bg:     rgba(251,113,133,0.1);
-  --negative-border: rgba(251,113,133,0.22);
-  --warning:         #fbbf24;
-  --warning-bg:      rgba(251,191,36,0.1);
-
-  --border:        rgba(255,255,255,0.06);
-  --border-bright: rgba(255,255,255,0.12);
-
-  --r-sm:  0.5rem;
-  --r-md:  0.875rem;
-  --r-lg:  1.25rem;
-  --r-xl:  1.75rem;
-  --r-2xl: 2.5rem;
-
-  --s-sm: 0.5rem;
-  --s-md: 1rem;
-  --s-lg: 1.5rem;
-  --s-xl: 2rem;
-  --s-2xl:3rem;
-
-  --shadow-md: 0 4px 16px rgba(0,0,0,0.55);
-  --shadow-lg: 0 8px 32px rgba(0,0,0,0.65);
-  --shadow-xl: 0 20px 60px rgba(0,0,0,0.7);
-
-  --t-fast:   120ms cubic-bezier(.4,0,.2,1);
-  --t-base:   200ms cubic-bezier(.4,0,.2,1);
-  --t-spring: 420ms cubic-bezier(.34,1.56,.64,1);
-
-  --font-display: var(--font-display-google, 'Syne'), system-ui, sans-serif;
-  --font-body: var(--font-sans-google, 'DM Sans'), system-ui, sans-serif;
-}
+/* Design tokens now come from app/styles/theme.css (imported by globals.css).
+   The page-local :root block was removed so Appearance settings — light mode,
+   theme colour, font size, density — reach this screen too. */
 
 /* =============================================
    RESET & BASE
@@ -293,7 +241,7 @@ input  { font-family: var(--font-body); border: none; outline: none; background:
   border-radius: var(--r-xl);
   padding: var(--s-xl) var(--s-2xl);
   position: relative; overflow: hidden;
-  box-shadow: var(--brand-glow);
+  box-shadow: 0 0 40px var(--brand-glow);
 }
 
 .selected-asset-header::before {
@@ -546,7 +494,7 @@ input  { font-family: var(--font-body); border: none; outline: none; background:
   border-radius: var(--r-2xl);
   padding: var(--s-2xl);
   max-width: 480px; width: 100%;
-  box-shadow: var(--shadow-xl), var(--brand-glow);
+  box-shadow: var(--shadow-xl), 0 0 40px var(--brand-glow);
   animation: slide-up 0.3s var(--t-spring);
   position: relative; overflow: hidden;
 }
@@ -775,4 +723,39 @@ input  { font-family: var(--font-body); border: none; outline: none; background:
   .buy-header, .search-section, .form-actions,
   .modal-actions, .confirmation-modal, .success-overlay { display: none !important; }
   body { background: white; color: black; }
+}
+
+/* ── Live-quote additions + responsive hardening ── */
+.buy-assets-container { padding-inline: var(--shell-pad); max-width: var(--shell-max); margin-inline: auto; }
+.buy-assets-container, .sell-assets-container { padding-bottom: 1.25rem; }
+
+.buy-banner {
+  display: flex; align-items: center; gap: .6rem; flex-wrap: wrap;
+  margin: 0 0 1rem; padding: .8rem 1rem; border-radius: var(--r-md);
+  background: var(--warning-bg); border: 1px solid var(--warning-b); color: var(--warning);
+  font-size: .85rem;
+}
+.buy-banner button {
+  margin-left: auto; min-height: 36px; padding: 0 .85rem; border-radius: var(--r-sm);
+  background: transparent; border: 1px solid currentColor; color: inherit;
+  font: 600 .78rem/1 var(--font-body); cursor: pointer;
+}
+
+.asset-skeleton {
+  height: 118px; border-radius: var(--r-lg);
+  background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-hover) 37%, var(--bg-card) 63%);
+  background-size: 400% 100%;
+  animation: asset-shimmer 1.3s ease infinite;
+}
+@keyframes asset-shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+
+.asset-card, .assets-grid, .buy-form-view { min-width: 0; }
+.asset-name, .asset-symbol { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+@media (max-width: 768px) {
+  .buy-banner button { margin-left: 0; width: 100%; }
+  .order-type-btn, .quick-amount-btn { min-height: 44px; }
+}
+@media (max-width: 480px) {
+  .assets-grid { grid-template-columns: 1fr; }
 }

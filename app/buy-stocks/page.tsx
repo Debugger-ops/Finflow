@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import {
   Search, TrendingUp, TrendingDown, ArrowLeft,
   ShoppingCart, CheckCircle, X, Zap,
@@ -31,17 +31,21 @@ interface OrderState {
 }
 
 // ─────────────────────────────────────────────
-// Static data
+// Tradable catalog — identity only. Prices are never hardcoded in a money app:
+// they are quoted live from /api/prices (Finnhub) and an asset without a quote
+// is shown as unavailable rather than sold at a stale number.
 // ─────────────────────────────────────────────
-const ASSETS: Asset[] = [
-  { id: '1', symbol: 'AAPL',  name: 'Apple Inc.',       price:   178.45, change:   2.34, changePercent:  1.33, logo: '🍎', category: 'stock'  },
-  { id: '2', symbol: 'GOOGL', name: 'Alphabet Inc.',    price:   142.87, change:  -1.23, changePercent: -0.85, logo: '🔍', category: 'stock'  },
-  { id: '3', symbol: 'MSFT',  name: 'Microsoft Corp.',  price:   412.34, change:   5.67, changePercent:  1.39, logo: '🪟', category: 'stock'  },
-  { id: '4', symbol: 'TSLA',  name: 'Tesla Inc.',       price:   248.92, change:  -3.45, changePercent: -1.37, logo: '⚡', category: 'stock'  },
-  { id: '5', symbol: 'AMZN',  name: 'Amazon.com Inc.',  price:   178.23, change:   1.89, changePercent:  1.07, logo: '📦', category: 'stock'  },
-  { id: '6', symbol: 'NVDA',  name: 'NVIDIA Corp.',     price:   878.45, change:  12.34, changePercent:  1.42, logo: '🎮', category: 'stock'  },
-  { id: '7', symbol: 'META',  name: 'Meta Platforms',   price:   485.67, change:   8.92, changePercent:  1.87, logo: '👤', category: 'stock'  },
-  { id: '8', symbol: 'BTC',   name: 'Bitcoin',          price: 67_234.50, change: -234.12, changePercent: -0.35, logo: '₿', category: 'crypto' },
+interface CatalogEntry { id: string; symbol: string; name: string; logo: string; category: 'stock' | 'crypto' | 'etf' }
+
+const CATALOG: CatalogEntry[] = [
+  { id: '1', symbol: 'AAPL',  name: 'Apple Inc.',      logo: '🍎', category: 'stock' },
+  { id: '2', symbol: 'GOOGL', name: 'Alphabet Inc.',   logo: '🔍', category: 'stock' },
+  { id: '3', symbol: 'MSFT',  name: 'Microsoft Corp.', logo: '🪟', category: 'stock' },
+  { id: '4', symbol: 'TSLA',  name: 'Tesla Inc.',      logo: '⚡', category: 'stock' },
+  { id: '5', symbol: 'AMZN',  name: 'Amazon.com Inc.', logo: '📦', category: 'stock' },
+  { id: '6', symbol: 'NVDA',  name: 'NVIDIA Corp.',    logo: '🎮', category: 'stock' },
+  { id: '7', symbol: 'META',  name: 'Meta Platforms',  logo: '👤', category: 'stock' },
+  { id: '8', symbol: 'SPY',   name: 'S&P 500 ETF',     logo: '📈', category: 'etf'   },
 ];
 
 const QUICK_AMOUNTS = [1, 5, 10, 25];
@@ -92,17 +96,19 @@ const AssetCard: React.FC<{ asset: Asset; onClick: () => void; index: number }> 
 
 /** Assets list / search view */
 const AssetsListView: React.FC<{
+  assets:      Asset[];
+  loading:     boolean;
   searchQuery: string;
   onSearch:    (q: string) => void;
   onSelect:    (asset: Asset) => void;
-}> = ({ searchQuery, onSearch, onSelect }) => {
+}> = ({ assets, loading, searchQuery, onSearch, onSelect }) => {
   const filtered = useMemo(
-    () => ASSETS.filter(
+    () => assets.filter(
       (a) =>
         a.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
         a.name.toLowerCase().includes(searchQuery.toLowerCase())
     ),
-    [searchQuery]
+    [assets, searchQuery]
   );
 
   return (
@@ -124,7 +130,9 @@ const AssetsListView: React.FC<{
       </div>
 
       <div className="assets-grid">
-        {filtered.length > 0 ? (
+        {loading ? (
+          Array.from({ length: 6 }).map((_, i) => <div key={i} className="asset-skeleton" aria-hidden />)
+        ) : filtered.length > 0 ? (
           filtered.map((asset, i) => (
             <AssetCard
               key={asset.id}
@@ -396,6 +404,54 @@ const BuyAssets: React.FC = () => {
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
   const [pendingOrder, setPendingOrder]   = useState<OrderState | null>(null);
 
+  const [assets, setAssets]   = useState<Asset[]>([]);
+  const [balance, setBalance] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError]     = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  /** Live quotes for the catalog; assets without a quote are filtered out so
+   *  nothing can be bought at a stale price. */
+  const loadQuotes = useCallback(async () => {
+    setLoading(true);
+    try {
+      const symbols = CATALOG.map(c => c.symbol).join(',');
+      const [quoteRes, balRes] = await Promise.all([
+        fetch(`/api/prices?symbols=${symbols}`),
+        fetch('/api/user/balance'),
+      ]);
+      if (balRes.ok) {
+        const b = await balRes.json();
+        if (typeof b?.balance === 'number') setBalance(b.balance);
+      }
+      if (!quoteRes.ok) throw new Error('quotes');
+      const quotes = await quoteRes.json();
+
+      const priced = CATALOG
+        .map(c => {
+          const q = quotes[c.symbol];
+          if (!q || !q.price) return null;
+          return {
+            ...c,
+            price: q.price,
+            change: q.change ?? 0,
+            changePercent: q.changePercent ?? 0,
+          } as Asset;
+        })
+        .filter(Boolean) as Asset[];
+
+      setAssets(priced);
+      setError(priced.length === 0 ? 'Live prices are unavailable right now, so trading is paused.' : null);
+    } catch {
+      setAssets([]);
+      setError('Live prices are unavailable right now, so trading is paused.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { loadQuotes(); }, [loadQuotes]);
+
   const handleSelectAsset = useCallback((asset: Asset) => {
     setSelectedAsset(asset);
     setView('form');
@@ -407,14 +463,35 @@ const BuyAssets: React.FC = () => {
   }, []);
 
   const handleConfirm = useCallback(async () => {
-    if (!pendingOrder) return;
+    if (!pendingOrder || submitting) return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/orders/buy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          symbol: pendingOrder.asset.symbol,
+          name:   pendingOrder.asset.name,
+          shares: pendingOrder.quantity,
+          // A limit order still executes at the limit price in this build;
+          // the server re-validates the total against the balance.
+          price:  pendingOrder.limitPrice ?? pendingOrder.asset.price,
+        }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(json?.error || 'Order failed');
 
-    // TODO: replace with real API call
-    // await fetch('/api/orders', { method: 'POST', body: JSON.stringify(pendingOrder) });
-    console.log('Order confirmed:', pendingOrder);
-
-    setView('success');
-  }, [pendingOrder]);
+      // Reflect the debit immediately; the nav and dashboard refetch on navigation.
+      setBalance(b => (b === null ? b : b - pendingOrder.total));
+      setView('success');
+    } catch (err: any) {
+      setError(err?.message || 'We could not place that order. Please try again.');
+      setView('form');
+    } finally {
+      setSubmitting(false);
+    }
+  }, [pendingOrder, submitting]);
 
   const handleReset = useCallback(() => {
     setSelectedAsset(null);
@@ -444,9 +521,18 @@ const BuyAssets: React.FC = () => {
         <div className="header-spacer" aria-hidden />
       </header>
 
+      {error && (
+        <div className="buy-banner" role="alert">
+          <span>{error}</span>
+          <button type="button" onClick={loadQuotes}>Retry</button>
+        </div>
+      )}
+
       {/* Views */}
       {view === 'list' && (
         <AssetsListView
+          assets={assets}
+          loading={loading}
           searchQuery={searchQuery}
           onSearch={setSearchQuery}
           onSelect={handleSelectAsset}

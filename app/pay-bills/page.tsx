@@ -1,65 +1,90 @@
 "use client";
-import React, { useState } from 'react';
-import { Zap, Search, ArrowLeft, Check, ChevronRight, Calendar, AlertCircle, TrendingDown } from 'lucide-react';
+
+/**
+ * Pay Bills — backed by /api/bills. Bills live in the database against the
+ * signed-in user, and paying one debits the real balance and writes a
+ * Transaction (category "bills") so it lands in history and the reports.
+ * This screen used to hold four hardcoded bills and fake the payment with a
+ * setTimeout.
+ */
+
+import React, { useCallback, useEffect, useState } from 'react';
+import {
+  Zap, Search, ArrowLeft, Check, ChevronRight, Calendar, AlertCircle,
+  TrendingDown, Plus, Trash2, RefreshCw, X,
+} from 'lucide-react';
 import './payBills.css';
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 interface Bill {
-  id: number;
+  id: string;
   name: string;
   category: string;
   amount: number;
   dueDate: string;
   logo: string;
   status: 'pending' | 'paid';
+  autopay: boolean;
+  paidAt: string | null;
 }
 
-const PayBills: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
-  const [isPaying, setIsPaying] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const router = useRouter();
+const CATEGORY_LOGOS: Record<string, string> = {
+  Utilities: '⚡', Internet: '🌐', Finance: '💳', Water: '💧',
+  Rent: '🏠', Phone: '📱', Insurance: '🛡️', Subscription: '🎬', Other: '🧾',
+};
 
-  const [bills, setBills] = useState<Bill[]>([
-    {
-      id: 1,
-      name: 'Electric Company',
-      category: 'Utilities',
-      amount: 125.50,
-      dueDate: '2026-02-10',
-      logo: '⚡',
-      status: 'pending',
-    },
-    {
-      id: 2,
-      name: 'Internet Provider',
-      category: 'Utilities',
-      amount: 79.99,
-      dueDate: '2026-02-12',
-      logo: '🌐',
-      status: 'pending',
-    },
-    {
-      id: 3,
-      name: 'Credit Card',
-      category: 'Finance',
-      amount: 450.00,
-      dueDate: '2026-02-15',
-      logo: '💳',
-      status: 'pending',
-    },
-    {
-      id: 4,
-      name: 'Water & Sewage',
-      category: 'Utilities',
-      amount: 62.30,
-      dueDate: '2026-02-08',
-      logo: '💧',
-      status: 'pending',
-    },
-  ]);
+const emptyDraft = () => ({
+  name: '', category: 'Utilities', amount: '',
+  dueDate: new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10),
+});
+
+const PayBills: React.FC = () => {
+  const router = useRouter();
+  const { status } = useSession();
+
+  const [searchTerm, setSearchTerm]     = useState('');
+  const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
+  const [isPaying, setIsPaying]         = useState(false);
+  const [isSuccess, setIsSuccess]       = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const [bills, setBills]     = useState<Bill[]>([]);
+  const [balance, setBalance] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError]     = useState<string | null>(null);
+
+  const [addOpen, setAddOpen] = useState(false);
+  const [draft, setDraft]     = useState(emptyDraft());
+  const [saving, setSaving]   = useState(false);
+
+  useEffect(() => {
+    if (status === 'unauthenticated') router.push('/login');
+  }, [status, router]);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [billsRes, balRes] = await Promise.all([
+        fetch('/api/bills'),
+        fetch('/api/user/balance'),
+      ]);
+      if (!billsRes.ok) throw new Error('bills');
+      const json = await billsRes.json();
+      setBills(json?.data?.bills ?? []);
+      if (balRes.ok) {
+        const b = await balRes.json();
+        if (typeof b?.balance === 'number') setBalance(b.balance);
+      }
+    } catch {
+      setError("We couldn't load your bills. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { if (status === 'authenticated') load(); }, [status, load]);
 
   const filteredBills = bills.filter(bill =>
     bill.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -69,7 +94,6 @@ const PayBills: React.FC = () => {
   const pendingBills = bills.filter(b => b.status === 'pending');
   const totalDue = pendingBills.reduce((sum, bill) => sum + bill.amount, 0);
 
-  // Check if bill is overdue
   const isOverdue = (dueDate: string) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -78,41 +102,45 @@ const PayBills: React.FC = () => {
     return due < today;
   };
 
-  // Get days until due
   const getDaysUntilDue = (dueDate: string) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const due = new Date(dueDate);
     due.setHours(0, 0, 0, 0);
-    const diffTime = due.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
+    return Math.ceil((due.getTime() - today.getTime()) / 86400000);
   };
 
   const handlePayBill = (bill: Bill) => {
+    setError(null);
     setSelectedBill(bill);
     setIsPaying(true);
   };
 
+  /** Real payment: the API debits the balance and records the transaction. */
   const confirmPayment = async () => {
-    if (selectedBill) {
-      setIsProcessing(true);
-      
-      // Simulate payment processing
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      setBills(bills.map(bill =>
-        bill.id === selectedBill.id ? { ...bill, status: 'paid' } : bill
-      ));
-      
-      setIsProcessing(false);
+    if (!selectedBill) return;
+    setIsProcessing(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/bills/${selectedBill.id}/pay`, { method: 'POST' });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(json?.error || 'Payment failed');
+
+      setBills(prev => prev.map(b =>
+        b.id === selectedBill.id ? { ...b, status: 'paid', paidAt: new Date().toISOString() } : b));
+      if (typeof json?.data?.balance === 'number') setBalance(json.data.balance);
+
       setIsSuccess(true);
-      
       setTimeout(() => {
         setIsPaying(false);
         setSelectedBill(null);
         setIsSuccess(false);
-      }, 2500);
+      }, 2200);
+    } catch (err: any) {
+      setError(err?.message || 'Payment failed. Please try again.');
+      setIsPaying(false);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -121,8 +149,41 @@ const PayBills: React.FC = () => {
     setSelectedBill(null);
   };
 
+  const addBill = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/bills', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...draft,
+          amount: Number(draft.amount),
+          logo: CATEGORY_LOGOS[draft.category] ?? '🧾',
+        }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(json?.error || 'Could not add the bill');
+      setBills(prev => [...prev, json.data].sort((a, b) => a.dueDate.localeCompare(b.dueDate)));
+      setDraft(emptyDraft());
+      setAddOpen(false);
+    } catch (err: any) {
+      setError(err?.message || 'Could not add the bill');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const deleteBill = async (id: string) => {
+    const previous = bills;
+    setBills(prev => prev.filter(b => b.id !== id));
+    const res = await fetch(`/api/bills/${id}`, { method: 'DELETE' }).catch(() => null);
+    if (!res?.ok) { setBills(previous); setError("Couldn't remove that bill."); }
+  };
+
   return (
-    <div className="pay-bills-container">
+    <div className="pay-bills-container has-app-nav">
       <div className="pay-bills-header">
         <button
           className="back-button"
@@ -133,9 +194,65 @@ const PayBills: React.FC = () => {
         </button>
         <div className="header-content">
           <h1 className="page-title">Pay Bills</h1>
-          <p className="page-subtitle">Manage and pay your bills</p>
+          <p className="page-subtitle">
+            {balance !== null
+              ? `Available balance $${balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+              : 'Manage and pay your bills'}
+          </p>
         </div>
+        <button type="button" className="add-bill-button" onClick={() => setAddOpen(o => !o)}>
+          {addOpen ? <X size={18} /> : <Plus size={18} />}
+          <span>{addOpen ? 'Close' : 'Add bill'}</span>
+        </button>
       </div>
+
+      {error && (
+        <div className="bills-banner" role="alert">
+          <AlertCircle size={16} />
+          <span>{error}</span>
+          <button type="button" onClick={load}><RefreshCw size={13} /> Retry</button>
+        </div>
+      )}
+
+      {addOpen && (
+        <form className="add-bill-form" onSubmit={addBill}>
+          <div className="add-bill-grid">
+            <label>
+              <span>Biller</span>
+              <input
+                required maxLength={80} value={draft.name}
+                onChange={e => setDraft({ ...draft, name: e.target.value })}
+                placeholder="Electric Company"
+              />
+            </label>
+            <label>
+              <span>Category</span>
+              <select value={draft.category} onChange={e => setDraft({ ...draft, category: e.target.value })}>
+                {Object.keys(CATEGORY_LOGOS).map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </label>
+            <label>
+              <span>Amount</span>
+              <input
+                required type="number" min="0.01" step="0.01" inputMode="decimal"
+                value={draft.amount}
+                onChange={e => setDraft({ ...draft, amount: e.target.value })}
+                placeholder="125.50"
+              />
+            </label>
+            <label>
+              <span>Due date</span>
+              <input
+                required type="date" value={draft.dueDate}
+                onChange={e => setDraft({ ...draft, dueDate: e.target.value })}
+              />
+            </label>
+          </div>
+          <button type="submit" className="add-bill-submit" disabled={saving}>
+            {saving ? 'Saving…' : 'Add bill'}
+          </button>
+        </form>
+      )}
 
       {!isPaying ? (
         <>
@@ -181,15 +298,26 @@ const PayBills: React.FC = () => {
               )}
             </div>
 
-            {filteredBills.length === 0 ? (
+            {loading ? (
+              <div className="bills-grid" aria-hidden>
+                {Array.from({ length: 4 }).map((_, i) => <div key={i} className="bill-skeleton" />)}
+              </div>
+            ) : filteredBills.length === 0 ? (
               <div className="empty-state">
                 <div className="empty-icon">
                   <Search size={48} />
                 </div>
-                <h3 className="empty-title">No bills found</h3>
+                <h3 className="empty-title">{searchTerm ? 'No bills found' : 'No bills yet'}</h3>
                 <p className="empty-message">
-                  {searchTerm ? 'Try adjusting your search terms' : 'You have no pending bills'}
+                  {searchTerm
+                    ? 'Try adjusting your search terms'
+                    : 'Add a bill and FinFlow will track the due date and pay it from your balance.'}
                 </p>
+                {!searchTerm && (
+                  <button type="button" className="add-bill-submit" onClick={() => setAddOpen(true)}>
+                    <Plus size={16} /> Add your first bill
+                  </button>
+                )}
               </div>
             ) : (
               <div className="bills-grid">
@@ -215,6 +343,14 @@ const PayBills: React.FC = () => {
                           <h3 className="bill-name">{bill.name}</h3>
                           <span className="bill-category">{bill.category}</span>
                         </div>
+                        <button
+                          type="button"
+                          className="bill-delete"
+                          aria-label={`Remove ${bill.name}`}
+                          onClick={() => deleteBill(bill.id)}
+                        >
+                          <Trash2 size={15} />
+                        </button>
                       </div>
 
                       <div className="bill-details">
@@ -247,8 +383,10 @@ const PayBills: React.FC = () => {
                           <button
                             onClick={() => handlePayBill(bill)}
                             className="pay-button"
+                            disabled={balance !== null && balance < bill.amount}
+                            title={balance !== null && balance < bill.amount ? 'Not enough balance' : undefined}
                           >
-                            Pay Now
+                            {balance !== null && balance < bill.amount ? 'Low balance' : 'Pay Now'}
                             <ChevronRight size={16} />
                           </button>
                         ) : (
@@ -293,6 +431,12 @@ const PayBills: React.FC = () => {
                         day: 'numeric',
                         year: 'numeric'
                       })}
+                    </span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="detail-label">Paid from</span>
+                    <span className="detail-value">
+                      Balance{balance !== null ? ` · $${balance.toFixed(2)} available` : ''}
                     </span>
                   </div>
                   <div className="detail-row total">

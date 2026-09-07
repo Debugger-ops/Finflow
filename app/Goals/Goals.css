@@ -5,76 +5,9 @@
 /* =============================================
    DESIGN TOKENS
    ============================================= */
-:root {
-  --bg-base:        #060912;
-  --bg-surface:     #0b0f1d;
-  --bg-card:        #11162a;
-  --bg-card-alt:    #161d34;
-  --bg-hover:       #1d2542;
-  --bg-active:      #243056;
-
-  --text-primary:   #eef1fb;
-  --text-secondary: #9aa6cc;
-  --text-muted:     #5f6a92;
-
-  --brand:          #6d7cff;
-  --brand-light:    #a5b4fc;
-  --brand-dim:      rgba(109,124,255,0.12);
-  --brand-border:   rgba(109,124,255,0.25);
-  --brand-glow:     0 0 40px rgba(109,124,255,0.18);
-
-  --accent-cyan:    #38bdf8;
-  --accent-violet:  #a78bfa;
-
-  --positive:        #34d399;
-  --positive-bg:     rgba(52,211,153,0.1);
-  --positive-border: rgba(52,211,153,0.22);
-  --negative:        #fb7185;
-  --negative-bg:     rgba(251,113,133,0.1);
-  --negative-border: rgba(251,113,133,0.22);
-  --warning:         #fbbf24;
-  --warning-bg:      rgba(251,191,36,0.1);
-  --warning-border:  rgba(251,191,36,0.25);
-
-  /* Category palette */
-  --cat-emergency:     #fb7185;
-  --cat-travel:        #60a5fa;
-  --cat-transport:     #34d399;
-  --cat-housing:       #a78bfa;
-  --cat-education:     #fbbf24;
-  --cat-health:        #f472b6;
-  --cat-business:      #818cf8;
-  --cat-tech:          #38bdf8;
-
-  --border:        rgba(255,255,255,0.06);
-  --border-bright: rgba(255,255,255,0.12);
-
-  --r-sm:  0.5rem;
-  --r-md:  0.875rem;
-  --r-lg:  1.25rem;
-  --r-xl:  1.75rem;
-  --r-2xl: 2.5rem;
-
-  --s-xs: 0.25rem;
-  --s-sm: 0.5rem;
-  --s-md: 1rem;
-  --s-lg: 1.5rem;
-  --s-xl: 2rem;
-  --s-2xl:3rem;
-
-  --shadow-sm: 0 1px 4px rgba(0,0,0,0.5);
-  --shadow-md: 0 4px 16px rgba(0,0,0,0.55);
-  --shadow-lg: 0 8px 32px rgba(0,0,0,0.65);
-  --shadow-xl: 0 20px 60px rgba(0,0,0,0.7);
-
-  --t-fast:   120ms cubic-bezier(.4,0,.2,1);
-  --t-base:   200ms cubic-bezier(.4,0,.2,1);
-  --t-slow:   350ms cubic-bezier(.4,0,.2,1);
-  --t-spring: 420ms cubic-bezier(.34,1.56,.64,1);
-
-  --font-display: var(--font-display-google, 'Syne'), system-ui, sans-serif;
-  --font-body: var(--font-sans-google, 'DM Sans'), system-ui, sans-serif;
-}
+/* Design tokens now come from app/styles/theme.css (imported by globals.css).
+   The page-local :root block was removed so Appearance settings — light mode,
+   theme colour, font size, density — reach this screen too. */
 
 /* =============================================
    RESET & BASE
@@ -521,7 +454,7 @@ input, textarea, select { font-family: var(--font-body); border: none; outline: 
   width: 100%; max-width: 560px;
   max-height: 90dvh;
   overflow-y: auto;
-  box-shadow: var(--shadow-xl), var(--brand-glow);
+  box-shadow: var(--shadow-xl), 0 0 40px var(--brand-glow);
   animation: slide-up 0.3s var(--t-spring);
   position: relative;
 }
@@ -536,7 +469,7 @@ input, textarea, select { font-family: var(--font-body); border: none; outline: 
 .modal-header {
   display: flex; align-items: center; justify-content: space-between;
   padding: var(--s-xl) var(--s-xl) 0;
-  position: sticky; top: 0;
+  position: sticky; top: var(--topnav-h);
   background: var(--bg-card);
   z-index: 2;
   padding-bottom: var(--s-lg);

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import {
   ArrowLeft, TrendingUp, TrendingDown,
   DollarSign, CheckCircle, Zap,
@@ -30,17 +30,12 @@ interface SaleOrder {
   profitLoss: number;
 }
 
-// ─────────────────────────────────────────────
-// Static data
-// ─────────────────────────────────────────────
-const HOLDINGS: Holding[] = [
-  { id: '1', symbol: 'AAPL',  name: 'Apple Inc.',       quantity: 10,  avgCost:  165.50, currentPrice:  178.45, logo: '🍎' },
-  { id: '2', symbol: 'MSFT',  name: 'Microsoft Corp.',  quantity:  5,  avgCost:  380.20, currentPrice:  412.34, logo: '🪟' },
-  { id: '3', symbol: 'NVDA',  name: 'NVIDIA Corp.',     quantity:  3,  avgCost:  720.00, currentPrice:  878.45, logo: '🎮' },
-  { id: '4', symbol: 'TSLA',  name: 'Tesla Inc.',       quantity:  8,  avgCost:  255.30, currentPrice:  248.92, logo: '⚡' },
-  { id: '5', symbol: 'AMZN',  name: 'Amazon.com Inc.',  quantity: 12,  avgCost:  168.75, currentPrice:  178.23, logo: '📦' },
-  { id: '6', symbol: 'BTC',   name: 'Bitcoin',          quantity:  0.5, avgCost: 64_500.00, currentPrice: 67_234.50, logo: '₿' },
-];
+// Holdings come from /api/portfolio (real positions priced live), never from a
+// hardcoded list — you cannot sell shares you do not own.
+const SYMBOL_LOGOS: Record<string, string> = {
+  AAPL: '🍎', GOOGL: '🔍', MSFT: '🪟', TSLA: '⚡',
+  AMZN: '📦', NVDA: '🎮', META: '👤', SPY: '📈', BTC: '₿',
+};
 
 const PCT_PRESETS = [
   { label: '25%', value: 0.25 },
@@ -67,9 +62,9 @@ function calcGainLoss(h: Holding) {
 // ─────────────────────────────────────────────
 // Portfolio summary stats
 // ─────────────────────────────────────────────
-function PortfolioStats() {
-  const totalValue = HOLDINGS.reduce((s, h) => s + h.currentPrice * h.quantity, 0);
-  const totalPnL   = HOLDINGS.reduce((s, h) => {
+function PortfolioStats({ holdings }: { holdings: Holding[] }) {
+  const totalValue = holdings.reduce((s, h) => s + h.currentPrice * h.quantity, 0);
+  const totalPnL   = holdings.reduce((s, h) => {
     const { gainLoss } = calcGainLoss(h);
     return s + gainLoss;
   }, 0);
@@ -150,20 +145,34 @@ const HoldingCard: React.FC<{ holding: Holding; onClick: () => void; index: numb
 };
 
 /** Holdings portfolio list view */
-const HoldingsListView: React.FC<{ onSelect: (h: Holding) => void }> = ({ onSelect }) => (
+const HoldingsListView: React.FC<{
+  holdings: Holding[];
+  loading:  boolean;
+  onSelect: (h: Holding) => void;
+  onBrowse: () => void;
+}> = ({ holdings, loading, onSelect, onBrowse }) => (
   <div className="holdings-list-view">
     <div className="portfolio-summary">
       <div className="summary-text">
         <h2>Your Portfolio</h2>
-        <p>Select an asset to sell</p>
+        <p>{holdings.length > 0 ? 'Select an asset to sell' : 'Nothing to sell yet'}</p>
       </div>
-      <PortfolioStats />
+      <PortfolioStats holdings={holdings} />
     </div>
 
     <div className="holdings-grid">
-      {HOLDINGS.map((holding, i) => (
-        <HoldingCard key={holding.id} holding={holding} index={i} onClick={() => onSelect(holding)} />
-      ))}
+      {loading
+        ? Array.from({ length: 4 }).map((_, i) => <div key={i} className="holding-skeleton" aria-hidden />)
+        : holdings.length > 0
+          ? holdings.map((holding, i) => (
+              <HoldingCard key={holding.id} holding={holding} index={i} onClick={() => onSelect(holding)} />
+            ))
+          : (
+            <div className="holdings-empty">
+              <p>You don't hold any assets yet.</p>
+              <button type="button" onClick={onBrowse}>Buy your first asset</button>
+            </div>
+          )}
     </div>
   </div>
 );
@@ -449,6 +458,40 @@ const SellAssets: React.FC = () => {
   const [selectedHolding, setSelected]    = useState<Holding | null>(null);
   const [pendingOrder, setPendingOrder]   = useState<SaleOrder | null>(null);
 
+  const [holdings, setHoldings] = useState<Holding[]>([]);
+  const [loading, setLoading]   = useState(true);
+  const [error, setError]       = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  /** Real positions, priced live by /api/portfolio. */
+  const loadPortfolio = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/portfolio');
+      if (!res.ok) throw new Error('portfolio');
+      const json = await res.json();
+      if (!json?.success) throw new Error('portfolio');
+
+      setHoldings((json.data.positions ?? []).map((pos: any) => ({
+        id: pos.symbol,
+        symbol: pos.symbol,
+        name: pos.name || pos.symbol,
+        quantity: pos.shares,
+        avgCost: pos.avgCost,
+        currentPrice: pos.price,
+        logo: SYMBOL_LOGOS[pos.symbol] ?? '💠',
+      })));
+      setError(null);
+    } catch {
+      setHoldings([]);
+      setError("We couldn't load your holdings. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { loadPortfolio(); }, [loadPortfolio]);
+
   const handleSelectHolding = useCallback((h: Holding) => {
     setSelected(h);
     setView('form');
@@ -460,12 +503,31 @@ const SellAssets: React.FC = () => {
   }, []);
 
   const handleConfirm = useCallback(async () => {
-    if (!pendingOrder) return;
-    // TODO: replace with real API call
-    // await fetch('/api/orders/sell', { method: 'POST', body: JSON.stringify(pendingOrder) });
-    console.log('Sale confirmed:', pendingOrder);
-    setView('success');
-  }, [pendingOrder]);
+    if (!pendingOrder || submitting) return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/orders/sell', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          symbol: pendingOrder.holding.symbol,
+          name:   pendingOrder.holding.name,
+          shares: pendingOrder.quantity,
+          price:  pendingOrder.limitPrice ?? pendingOrder.holding.currentPrice,
+        }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(json?.error || 'Sale failed');
+      await loadPortfolio();
+      setView('success');
+    } catch (err: any) {
+      setError(err?.message || 'We could not place that sale. Please try again.');
+      setView('form');
+    } finally {
+      setSubmitting(false);
+    }
+  }, [pendingOrder, submitting]);
 
   const handleReset = useCallback(() => {
     setSelected(null);
@@ -495,7 +557,21 @@ const SellAssets: React.FC = () => {
       </header>
 
       {/* Views */}
-      {view === 'list' && <HoldingsListView onSelect={handleSelectHolding} />}
+      {error && (
+        <div className="sell-banner" role="alert">
+          <span>{error}</span>
+          <button type="button" onClick={loadPortfolio}>Retry</button>
+        </div>
+      )}
+
+      {view === 'list' && (
+        <HoldingsListView
+          holdings={holdings}
+          loading={loading}
+          onSelect={handleSelectHolding}
+          onBrowse={() => router.push('/buy-stocks')}
+        />
+      )}
 
       {view === 'form' && selectedHolding && (
         <SellFormView

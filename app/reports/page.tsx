@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   ArrowLeft, Download, Share2, Calendar, TrendingUp, TrendingDown,
   DollarSign, ShoppingBag, Coffee, Car, Home, Smartphone, Zap,
@@ -17,68 +17,47 @@ import {
   PolarGrid, PolarAngleAxis, PolarRadiusAxis
 } from "recharts";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import "./reports.css";
 
 // ─────────────────────────────────────
-// Data
+// Shapes returned by /api/reports — every figure on this page is computed
+// from the signed-in user's completed transactions.
 // ─────────────────────────────────────
-const monthlyData = [
-  { month: "Jul", income: 7800, expenses: 5200, savings: 2600, net: 2600 },
-  { month: "Aug", income: 8200, expenses: 5100, savings: 3100, net: 3100 },
-  { month: "Sep", income: 8500, expenses: 4800, savings: 3700, net: 3700 },
-  { month: "Oct", income: 8100, expenses: 5400, savings: 2700, net: 2700 },
-  { month: "Nov", income: 9000, expenses: 4600, savings: 4400, net: 4400 },
-  { month: "Dec", income: 8700, expenses: 5200, savings: 3500, net: 3500 },
-  { month: "Jan", income: 8500, expenses: 4670, savings: 3830, net: 3830 },
-];
+interface ReportSeries { month: string; income: number; expenses: number; savings: number; net: number }
+interface ReportCategory { category: string; amount: number; previous: number; pct: number; share: number }
+interface ReportMerchant { name: string; amount: number; count: number }
+interface ReportData {
+  period: string;
+  totals: {
+    income: number; expenses: number; savings: number; avgSavingsRate: number;
+    incomeChange: number; expensesChange: number; savingsChange: number; rateChange: number;
+  };
+  series: ReportSeries[];
+  savingsHistory: { month: string; rate: number }[];
+  categories: ReportCategory[];
+  topMerchants: ReportMerchant[];
+  weekly: { week: string; amount: number }[];
+  cashflow: { day: number; flow: number }[];
+}
 
-const categoryData = [
-  { name: "Housing",    amount: 1500, budget: 1500, pct: 100, color: "#818cf8", icon: Home       },
-  { name: "Food",       amount: 890,  budget: 1000, pct: 89,  color: "#fbbf24", icon: Coffee     },
-  { name: "Shopping",   amount: 650,  budget: 600,  pct: 108, color: "#60a5fa", icon: ShoppingBag},
-  { name: "Transport",  amount: 420,  budget: 500,  pct: 84,  color: "#a78bfa", icon: Car        },
-  { name: "Utilities",  amount: 280,  budget: 300,  pct: 93,  color: "#34d399", icon: Zap        },
-  { name: "Entertainment",amount:280, budget: 300,  pct: 93,  color: "#f87171", icon: Smartphone },
-  { name: "Other",      amount: 650,  budget: 700,  pct: 93,  color: "#fb923c", icon: Layers     },
-];
+const CATEGORY_STYLE: Record<string, { label: string; color: string; icon: any }> = {
+  food:          { label: "Food & Drink",  color: "#fbbf24", icon: Coffee },
+  shopping:      { label: "Shopping",      color: "#60a5fa", icon: ShoppingBag },
+  transport:     { label: "Transport",     color: "#a78bfa", icon: Car },
+  bills:         { label: "Bills",         color: "#34d399", icon: Zap },
+  entertainment: { label: "Entertainment", color: "#f87171", icon: Smartphone },
+  income:        { label: "Income",        color: "#34d399", icon: TrendingUp },
+  investment:    { label: "Investment",    color: "#818cf8", icon: Briefcase },
+  transfer:      { label: "Transfer",      color: "#60a5fa", icon: Globe },
+  other:         { label: "Other",         color: "#fb923c", icon: Layers },
+};
+const catStyle = (c?: string) => CATEGORY_STYLE[c ?? "other"] ?? CATEGORY_STYLE.other;
 
-const pieData = categoryData.map(c => ({ name: c.name, value: c.amount, color: c.color }));
+const MERCHANT_COLORS = ["#818cf8", "#60a5fa", "#fbbf24", "#a78bfa", "#f87171"];
 
-const weeklyData = [
-  { week: "W1", amount: 980  },
-  { week: "W2", amount: 1240 },
-  { week: "W3", amount: 860  },
-  { week: "W4", amount: 1590 },
-];
-
-const radarData = [
-  { subject: "Food",     A: 89,  fullMark: 100 },
-  { subject: "Shopping", A: 108, fullMark: 100 },
-  { subject: "Transport",A: 84,  fullMark: 100 },
-  { subject: "Utilities",A: 93,  fullMark: 100 },
-  { subject: "Housing",  A: 100, fullMark: 100 },
-  { subject: "Fun",      A: 93,  fullMark: 100 },
-];
-
-const topMerchants = [
-  { name: "Rent / Housing",   amount: 1500, count: 1, icon: Home,        color: "#818cf8" },
-  { name: "Amazon",           amount: 342,  count: 8, icon: ShoppingBag, color: "#60a5fa" },
-  { name: "Grocery Store",    amount: 286,  count: 6, icon: ShoppingBag, color: "#fbbf24" },
-  { name: "Uber",             amount: 198,  count: 9, icon: Car,         color: "#a78bfa" },
-  { name: "Netflix",          amount: 16,   count: 1, icon: Smartphone,  color: "#f87171" },
-];
-
-const savingsHistory = [
-  { month: "Jul", rate: 33 }, { month: "Aug", rate: 38 },
-  { month: "Sep", rate: 44 }, { month: "Oct", rate: 33 },
-  { month: "Nov", rate: 49 }, { month: "Dec", rate: 40 },
-  { month: "Jan", rate: 45 },
-];
-
-const cashflowDays = Array.from({ length: 31 }, (_, i) => ({
-  day: i + 1,
-  flow: Math.round((Math.random() - 0.42) * 600),
-}));
+const money = (n: number, decimals = 0) =>
+  n.toLocaleString("en-US", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
 
 // ─────────────────────────────────────
 // Custom tooltips
@@ -150,28 +129,137 @@ const AnimNum: React.FC<{ value: number; prefix?: string; suffix?: string; decim
 // ─────────────────────────────────────
 const ReportsPage: React.FC = () => {
   const router = useRouter();
+  const { status } = useSession();
   const [period, setPeriod] = useState<"3m" | "6m" | "1y">("6m");
   const [activeSection, setActiveSection] = useState<"overview" | "spending" | "cashflow" | "trends">("overview");
   const [exportOpen, setExportOpen] = useState(false);
 
-  const totalIncome   = 59800;
-  const totalExpenses = 35370;
-  const totalSavings  = totalIncome - totalExpenses;
-  const avgSavingsRate = 40.7;
-  const netWorthGrowth = 12.5;
+  const [report, setReport]   = useState<ReportData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError]     = useState<string | null>(null);
+
+  useEffect(() => {
+    if (status === "unauthenticated") router.push("/login");
+  }, [status, router]);
+
+  const loadReport = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/reports?period=${period}`);
+      if (!res.ok) throw new Error("report");
+      const json = await res.json();
+      if (!json?.success) throw new Error("report");
+      setReport(json.data);
+    } catch {
+      setError("We couldn't build your report. Please try again.");
+      setReport(null);
+    } finally {
+      setLoading(false);
+    }
+  }, [period]);
+
+  useEffect(() => { if (status === "authenticated") loadReport(); }, [status, loadReport]);
+
+  // Close the export menu on an outside click.
+  useEffect(() => {
+    if (!exportOpen) return;
+    const close = (e: MouseEvent) => {
+      if (!(e.target as HTMLElement).closest(".rpt-export-wrap")) setExportOpen(false);
+    };
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
+  }, [exportOpen]);
+
+  // ── Derived view models ──
+  const monthlyData    = report?.series ?? [];
+  const savingsHistory = report?.savingsHistory ?? [];
+  const weeklyData     = report?.weekly ?? [];
+  const cashflowDays   = report?.cashflow ?? [];
+
+  const totalIncome    = report?.totals.income ?? 0;
+  const totalExpenses  = report?.totals.expenses ?? 0;
+  const totalSavings   = report?.totals.savings ?? 0;
+  const avgSavingsRate = report?.totals.avgSavingsRate ?? 0;
+
+  const categoryData = (report?.categories ?? []).map(c => {
+    const st = catStyle(c.category);
+    return { name: st.label, amount: c.amount, budget: c.previous, pct: c.pct, share: c.share, color: st.color, icon: st.icon };
+  });
+  const pieData = categoryData.map(c => ({ name: c.name, value: c.amount, color: c.color }));
+
+  const topMerchants = (report?.topMerchants ?? []).map((m, i) => ({
+    ...m, icon: Briefcase, color: MERCHANT_COLORS[i % MERCHANT_COLORS.length],
+  }));
+
+  // Radar compares this month against last month per category (100 = level).
+  const radarData = categoryData
+    .filter(c => c.budget > 0)
+    .slice(0, 6)
+    .map(c => ({ subject: c.name, A: Math.min(c.pct, 200), fullMark: 100 }));
+
+  const monthSpend = categoryData.reduce((s, c) => s + c.amount, 0);
+
+  const inflow  = cashflowDays.reduce((s, d) => s + Math.max(d.flow, 0), 0);
+  const outflow = cashflowDays.reduce((s, d) => s + Math.min(d.flow, 0), 0);
+
+  const cur  = monthlyData[monthlyData.length - 1];
+  const prev = monthlyData.length > 1 ? monthlyData[monthlyData.length - 2] : null;
+  const pctDelta = (a: number, b: number) => (b > 0 ? Math.round(((a - b) / b) * 1000) / 10 : 0);
+
+  const momRows = report && cur && prev ? [
+    { label: "Income",    change: pctDelta(cur.income, prev.income),     goodWhenUp: true },
+    { label: "Expenses",  change: pctDelta(cur.expenses, prev.expenses), goodWhenUp: false },
+    { label: "Savings",   change: pctDelta(cur.savings, prev.savings),   goodWhenUp: true },
+    { label: "Savings %", change: report.totals.rateChange,              goodWhenUp: true },
+    ...categoryData.filter(c => c.budget > 0).slice(0, 2).map(c => ({
+      label: c.name, change: pctDelta(c.amount, c.budget), goodWhenUp: false,
+    })),
+  ] : [];
+
+  const peakWeek = weeklyData.reduce<{ week: string; amount: number } | null>(
+    (best, w) => (!best || w.amount > best.amount ? w : best), null);
+
+  const bestMonth = savingsHistory.reduce<{ month: string; rate: number } | null>(
+    (best, m) => (!best || m.rate > best.rate ? m : best), null);
+  const topCategory = categoryData[0];
 
   const kpiCards = [
-    { label: "Total Income",    value: totalIncome,   change: +5.2,  prefix: "$", color: "#34d399", icon: TrendingUp   },
-    { label: "Total Expenses",  value: totalExpenses, change: -2.1,  prefix: "$", color: "#f87171", icon: TrendingDown },
-    { label: "Net Savings",     value: totalSavings,  change: +14.3, prefix: "$", color: "#818cf8", icon: Wallet       },
-    { label: "Savings Rate",    value: avgSavingsRate,change: +2.4,  prefix: "",  suffix: "%", color: "#fbbf24", icon: Percent },
+    { label: "Total Income",   value: totalIncome,    change: report?.totals.incomeChange   ?? 0, prefix: "$", color: "#34d399", icon: TrendingUp   },
+    { label: "Total Expenses", value: totalExpenses,  change: report?.totals.expensesChange ?? 0, prefix: "$", color: "#f87171", icon: TrendingDown },
+    { label: "Net Savings",    value: totalSavings,   change: report?.totals.savingsChange  ?? 0, prefix: "$", color: "#818cf8", icon: Wallet       },
+    { label: "Avg Savings Rate", value: avgSavingsRate, change: report?.totals.rateChange   ?? 0, prefix: "",  suffix: "%", color: "#fbbf24", icon: Percent },
   ];
 
-  const insights = [
-    { type: "success", icon: CheckCircle, title: "Best savings month", desc: "November had your highest savings rate at 49% — great discipline!" },
-    { type: "warning", icon: AlertCircle, title: "Shopping over budget", desc: "Shopping exceeded budget by 8% ($50 over). Consider reviewing subscriptions." },
-    { type: "info",    icon: Sparkles,    title: "Savings milestone", desc: "You're on track to hit $25,000 in savings by March 2025." },
-  ];
+  // Insights read off the same numbers the charts use.
+  const insights: { type: string; icon: any; title: string; desc: string }[] = [];
+  if (report) {
+    if (bestMonth && bestMonth.rate > 0) {
+      insights.push({ type: "success", icon: CheckCircle, title: "Best savings month",
+        desc: `${bestMonth.month} was your strongest, saving ${bestMonth.rate.toFixed(1)}% of what came in.` });
+    }
+    if (topCategory) {
+      const over = topCategory.budget > 0 && topCategory.pct > 100;
+      insights.push({
+        type: over ? "warning" : "info",
+        icon: over ? AlertCircle : PieIcon,
+        title: over ? `${topCategory.name} is up on last month` : `${topCategory.name} leads your spending`,
+        desc: topCategory.budget > 0
+          ? `$${money(topCategory.amount)} this month vs $${money(topCategory.budget)} last — ${topCategory.pct}% of it.`
+          : `$${money(topCategory.amount)} so far, ${topCategory.share.toFixed(0)}% of this month's spend.`,
+      });
+    }
+    if (avgSavingsRate > 0 && totalSavings > 0) {
+      const monthsTracked = monthlyData.length || 1;
+      const perMonth = totalSavings / monthsTracked;
+      insights.push({ type: "info", icon: Sparkles, title: "Savings pace",
+        desc: `At $${money(perMonth)} saved per month you'd add about $${money(perMonth * 12)} over a year.` });
+    }
+  }
+  if (insights.length === 0 && !loading) {
+    insights.push({ type: "info", icon: Sparkles, title: "Not enough history yet",
+      desc: "Once you have a few completed transactions this report fills in automatically." });
+  }
 
   return (
     <div className="rpt-shell">
@@ -180,7 +268,7 @@ const ReportsPage: React.FC = () => {
       <header className="rpt-header">
         <div className="rpt-header-inner">
           <div className="rpt-header-left">
-            <button className="rpt-back-btn" onClick={() => router.push("/")}>
+            <button className="rpt-back-btn" onClick={() => router.push("/dashboard")}>
               <ArrowLeft size={16} /> Dashboard
             </button>
             <div className="rpt-header-divider" />
@@ -188,7 +276,10 @@ const ReportsPage: React.FC = () => {
               <div className="rpt-logo"><FileText size={16} /></div>
               <div>
                 <h1 className="rpt-heading">Financial Report</h1>
-                <p className="rpt-subheading">January 2025 · Updated just now</p>
+                <p className="rpt-subheading">
+                  {new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })} ·{" "}
+                  {loading ? "Building report…" : "Updated just now"}
+                </p>
               </div>
             </div>
           </div>
@@ -211,9 +302,12 @@ const ReportsPage: React.FC = () => {
               </button>
               {exportOpen && (
                 <div className="rpt-export-menu">
-                  <button><FileText size={13} /> PDF Report</button>
-                  <button><BarChart2 size={13} /> Excel / CSV</button>
-                  <button><Share2 size={13} /> Share Link</button>
+                  <button onClick={() => { setExportOpen(false); window.print(); }}>
+                    <FileText size={13} /> Print / PDF
+                  </button>
+                  <button onClick={() => { setExportOpen(false); window.location.href = "/api/transactions/history?format=csv&limit=100&range=year"; }}>
+                    <BarChart2 size={13} /> Transactions CSV
+                  </button>
                 </div>
               )}
             </div>
@@ -235,7 +329,22 @@ const ReportsPage: React.FC = () => {
         </div>
       </header>
 
-      <main className="rpt-main">
+      <main className="rpt-main has-app-nav">
+
+        {error && (
+          <div className="rpt-banner" role="alert">
+            <AlertCircle size={16} />
+            <span>{error}</span>
+            <button type="button" onClick={loadReport}><RefreshCw size={13} /> Retry</button>
+          </div>
+        )}
+
+        {!loading && !error && monthlyData.every(m => m.income === 0 && m.expenses === 0) && (
+          <div className="rpt-banner info" role="status">
+            <Sparkles size={16} />
+            <span>No completed transactions in this period yet — the charts below will fill in as you use FinFlow.</span>
+          </div>
+        )}
 
         {/* ── KPI CARDS ── */}
         <div className="rpt-kpi-row">
@@ -354,7 +463,9 @@ const ReportsPage: React.FC = () => {
                     </Bar>
                   </BarChart>
                 </ResponsiveContainer>
-                <p className="rpt-week-note">Week 4 was your highest-spend week</p>
+                {peakWeek && peakWeek.amount > 0 && (
+                  <p className="rpt-week-note">{peakWeek.week} was your highest-spend week (${money(peakWeek.amount)})</p>
+                )}
               </div>
             </div>
           </>
@@ -369,7 +480,7 @@ const ReportsPage: React.FC = () => {
                 <div className="rpt-card-header">
                   <div>
                     <h2 className="rpt-card-title">Spending by Category</h2>
-                    <p className="rpt-card-sub">Total: ${totalExpenses.toLocaleString()}</p>
+                    <p className="rpt-card-sub">This month: ${money(monthSpend, 2)}</p>
                   </div>
                 </div>
                 <ResponsiveContainer width="100%" height={240}>
@@ -398,15 +509,18 @@ const ReportsPage: React.FC = () => {
               <div className="rpt-card">
                 <div className="rpt-card-header">
                   <div>
-                    <h2 className="rpt-card-title">Budget vs Actual</h2>
-                    <p className="rpt-card-sub">This month's performance</p>
+                    <h2 className="rpt-card-title">This Month vs Last</h2>
+                    <p className="rpt-card-sub">Same categories, real baselines</p>
                   </div>
                   <div className="rpt-legend-sm">
-                    <span><i style={{ background: "#818cf8" }} />Spent</span>
-                    <span><i style={{ background: "rgba(255,255,255,0.1)" }} />Budget</span>
+                    <span><i style={{ background: "#818cf8" }} />This month</span>
+                    <span><i style={{ background: "rgba(255,255,255,0.1)" }} />Last month</span>
                   </div>
                 </div>
                 <div className="rpt-budget-bars">
+                  {!loading && categoryData.length === 0 && (
+                    <p className="rpt-empty">No spending recorded this month.</p>
+                  )}
                   {categoryData.map((c, i) => (
                     <div key={i} className="rpt-budget-row">
                       <div className="rpt-budget-label">
@@ -423,8 +537,10 @@ const ReportsPage: React.FC = () => {
                           }} />
                         </div>
                         <div className="rpt-budget-nums">
-                          <span className={c.pct > 100 ? "over" : ""}>${c.amount}</span>
-                          <span className="rpt-budget-limit">/ ${c.budget}</span>
+                          <span className={c.pct > 100 ? "over" : ""}>${money(c.amount)}</span>
+                          <span className="rpt-budget-limit">
+                            {c.budget > 0 ? `/ $${money(c.budget)} last month` : "· no history"}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -440,9 +556,12 @@ const ReportsPage: React.FC = () => {
                   <h2 className="rpt-card-title">Top Merchants</h2>
                   <p className="rpt-card-sub">Where your money goes</p>
                 </div>
-                <span className="rpt-tag indigo">This month</span>
+                <span className="rpt-tag indigo">{period === "3m" ? "Last 3 months" : period === "6m" ? "Last 6 months" : "Last year"}</span>
               </div>
               <div className="rpt-merchants">
+                {!loading && topMerchants.length === 0 && (
+                  <p className="rpt-empty">No outgoing payments in this period.</p>
+                )}
                 {topMerchants.map((m, i) => (
                   <div key={i} className="rpt-merchant-row">
                     <div className="rpt-merchant-rank">#{i + 1}</div>
@@ -456,12 +575,12 @@ const ReportsPage: React.FC = () => {
                     <div className="rpt-merchant-bar-wrap">
                       <div className="rpt-merchant-track">
                         <div className="rpt-merchant-fill"
-                          style={{ width: `${(m.amount / topMerchants[0].amount) * 100}%`, background: m.color }} />
+                          style={{ width: `${topMerchants[0].amount ? (m.amount / topMerchants[0].amount) * 100 : 0}%`, background: m.color }} />
                       </div>
                     </div>
                     <div className="rpt-merchant-amount">
-                      <strong>${m.amount.toLocaleString()}</strong>
-                      <span>{((m.amount / totalExpenses) * 100).toFixed(1)}%</span>
+                      <strong>${money(m.amount, 2)}</strong>
+                      <span>{totalExpenses ? ((m.amount / totalExpenses) * 100).toFixed(1) : "0.0"}%</span>
                     </div>
                   </div>
                 ))}
@@ -476,7 +595,9 @@ const ReportsPage: React.FC = () => {
             <div className="rpt-card rpt-card-wide">
               <div className="rpt-card-header">
                 <div>
-                  <h2 className="rpt-card-title">Daily Cash Flow — January 2025</h2>
+                  <h2 className="rpt-card-title">
+                    Daily Cash Flow — {new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+                  </h2>
                   <p className="rpt-card-sub">Positive = money in · Negative = money out</p>
                 </div>
                 <div className="rpt-legend-sm">
@@ -515,9 +636,9 @@ const ReportsPage: React.FC = () => {
             {/* Cashflow stats */}
             <div className="rpt-three-col">
               {[
-                { label: "Total Inflow",  value: 9700,  color: "#34d399", icon: ArrowDownRight },
-                { label: "Total Outflow", value: 5870,  color: "#f87171", icon: ArrowUpRight   },
-                { label: "Net Flow",      value: 3830,  color: "#818cf8", icon: Activity       },
+                { label: "Total Inflow",  value: inflow,                    color: "#34d399", icon: ArrowDownRight },
+                { label: "Total Outflow", value: Math.abs(outflow),         color: "#f87171", icon: ArrowUpRight   },
+                { label: "Net Flow",      value: inflow + outflow,          color: "#818cf8", icon: Activity       },
               ].map((s, i) => (
                 <div key={i} className="rpt-flow-card">
                   <div className="rpt-flow-icon" style={{ background: s.color + "18", color: s.color }}>
@@ -541,19 +662,21 @@ const ReportsPage: React.FC = () => {
               <div className="rpt-card">
                 <div className="rpt-card-header">
                   <div>
-                    <h2 className="rpt-card-title">Budget Health Radar</h2>
-                    <p className="rpt-card-sub">% of budget used per category</p>
+                    <h2 className="rpt-card-title">Category Movement</h2>
+                    <p className="rpt-card-sub">This month as a % of last month (100 = level)</p>
                   </div>
-                  <span className="rpt-tag amber">Jan 2025</span>
+                  <span className="rpt-tag amber">
+                    {new Date().toLocaleDateString("en-US", { month: "short", year: "numeric" })}
+                  </span>
                 </div>
                 <ResponsiveContainer width="100%" height={260}>
                   <RadarChart data={radarData}>
                     <PolarGrid stroke="rgba(255,255,255,0.07)" />
                     <PolarAngleAxis dataKey="subject" tick={{ fill: "#7f8db0", fontSize: 11 }} />
-                    <PolarRadiusAxis angle={30} domain={[0, 120]} tick={{ fill: "#404870", fontSize: 9 }}
+                    <PolarRadiusAxis angle={30} domain={[0, 200]} tick={{ fill: "#404870", fontSize: 9 }}
                       tickFormatter={v => `${v}%`} />
                     <Radar name="Usage" dataKey="A" stroke="#818cf8" fill="#818cf8" fillOpacity={0.2} strokeWidth={2} />
-                    <Tooltip formatter={(v: any) => [`${v}%`, "Budget used"]}
+                    <Tooltip formatter={(v: any) => [`${v}%`, "vs last month"]}
                       contentStyle={{ background: "#0f1221", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, fontSize: 12 }} />
                   </RadarChart>
                 </ResponsiveContainer>
@@ -564,21 +687,17 @@ const ReportsPage: React.FC = () => {
                 <div className="rpt-card-header">
                   <div>
                     <h2 className="rpt-card-title">Month-over-Month</h2>
-                    <p className="rpt-card-sub">Change vs December 2024</p>
+                    <p className="rpt-card-sub">
+                      {prev ? `Change vs ${prev.month}` : "Change vs the previous month"}
+                    </p>
                   </div>
                 </div>
                 <div className="rpt-mom-list">
-                  {[
-                    { label: "Income",     change: -2.3, arrow: "down" },
-                    { label: "Expenses",   change: +10.2,arrow: "up"   },
-                    { label: "Savings",    change: +9.4, arrow: "up"   },
-                    { label: "Savings %",  change: +4.8, arrow: "up"   },
-                    { label: "Shopping",   change: -15.6,arrow: "down" },
-                    { label: "Food",       change: +3.1, arrow: "up"   },
-                  ].map((m, i) => {
-                    const isGood = (m.label === "Income" || m.label === "Savings" || m.label === "Savings %" || m.label === "Shopping")
-                      ? m.change >= 0
-                      : m.change <= 0;
+                  {!loading && momRows.length === 0 && (
+                    <p className="rpt-empty">Needs two months of activity to compare.</p>
+                  )}
+                  {momRows.map((m, i) => {
+                    const isGood = m.goodWhenUp ? m.change >= 0 : m.change <= 0;
                     return (
                       <div key={i} className="rpt-mom-row">
                         <span className="rpt-mom-label">{m.label}</span>
@@ -612,11 +731,19 @@ const ReportsPage: React.FC = () => {
               </div>
               <div className="rpt-projection-body">
                 <div className="rpt-projection-milestones">
-                  {[
-                    { label: "By March 2025",   amount: 25_000, icon: Target,  color: "#818cf8" },
-                    { label: "By June 2025",    amount: 35_000, icon: Award,   color: "#34d399" },
-                    { label: "By Dec 2025",     amount: 60_000, icon: Star,    color: "#fbbf24" },
-                  ].map((m, i) => (
+                  {(() => {
+                    const perMonth = monthlyData.length ? totalSavings / monthlyData.length : 0;
+                    const at = (months: number) => {
+                      const d = new Date();
+                      d.setMonth(d.getMonth() + months);
+                      return d.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+                    };
+                    return [
+                      { label: `By ${at(3)}`,  amount: Math.max(0, perMonth * 3),  icon: Target, color: "#818cf8" },
+                      { label: `By ${at(6)}`,  amount: Math.max(0, perMonth * 6),  icon: Award,  color: "#34d399" },
+                      { label: `By ${at(12)}`, amount: Math.max(0, perMonth * 12), icon: Star,   color: "#fbbf24" },
+                    ];
+                  })().map((m, i) => (
                     <div key={i} className="rpt-milestone">
                       <div className="rpt-milestone-icon" style={{ background: m.color + "18", color: m.color }}>
                         <m.icon size={20} />
@@ -632,7 +759,11 @@ const ReportsPage: React.FC = () => {
                 </div>
                 <div className="rpt-projection-note">
                   <Sparkles size={14} />
-                  <p>Based on your {avgSavingsRate}% average savings rate over the past 6 months. Keep going!</p>
+                  <p>
+                    Projected from your ${money(monthlyData.length ? totalSavings / monthlyData.length : 0)} average monthly
+                    saving over the last {monthlyData.length || 0} month{monthlyData.length === 1 ? "" : "s"}
+                    ({avgSavingsRate}% average savings rate). Not a guarantee — just your current pace.
+                  </p>
                 </div>
               </div>
             </div>
@@ -643,7 +774,7 @@ const ReportsPage: React.FC = () => {
         <div className="rpt-footer-summary">
           <div className="rpt-footer-left">
             <Clock size={13} />
-            <span>Report generated · January 31, 2025</span>
+            <span>Report generated · {new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</span>
           </div>
           <div className="rpt-footer-right">
             <button className="rpt-export-btn-sm" onClick={() => window.print()}>

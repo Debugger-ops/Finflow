@@ -1,0 +1,387 @@
+/* ============================================================================
+   AppNav — shared navigation shell (top bar + mobile tab bar + more sheet).
+   Tokens come from app/styles/theme.css, so the nav follows the user's
+   Appearance settings (light mode, theme colour, font size, density).
+   ============================================================================ */
+
+.appnav {
+  position: sticky;
+  top: 0;
+  z-index: 900;
+  background: color-mix(in srgb, var(--bg-secondary) 88%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+
+.appnav-inner {
+  max-width: var(--shell-max);
+  margin-inline: auto;
+  padding: 0 var(--shell-pad);
+  min-height: var(--topnav-h);
+  display: flex;
+  align-items: center;
+  gap: clamp(0.5rem, 2vw, 1.5rem);
+}
+
+/* ── Brand ── */
+.appnav-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-shrink: 0;
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.appnav-brand:hover { color: var(--text-primary); }
+.appnav-logo {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--r-md);
+  background: var(--brand-gradient);
+  color: #fff;
+  box-shadow: 0 6px 18px var(--brand-glow);
+  flex-shrink: 0;
+}
+.appnav-wordmark { font-size: 1.05rem; }
+
+/* ── Desktop links ── */
+.appnav-links {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  margin-inline: auto;
+  min-width: 0;
+}
+.appnav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 0.8rem;
+  border-radius: var(--r-md);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.appnav-link:hover { background: var(--bg-hover); color: var(--text-primary); }
+.appnav-link.is-active {
+  color: var(--text-primary);
+  background: var(--brand-dim);
+  box-shadow: inset 0 0 0 1px var(--brand-border);
+}
+
+/* ── Right-hand actions ── */
+.appnav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.appnav-balance {
+  display: none;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.15;
+  padding: 0.3rem 0.7rem;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: var(--bg-glass);
+  color: var(--text-primary);
+}
+.appnav-balance:hover { border-color: var(--border-bright); color: var(--text-primary); }
+.appnav-balance-label { font-size: 0.63rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
+.appnav-balance-value { font-size: 0.9rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+.appnav-send {
+  display: none;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1rem;
+  border-radius: var(--r-md);
+  background: var(--brand-gradient);
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 600;
+  box-shadow: 0 6px 18px var(--brand-glow);
+  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.appnav-send:hover { color: #fff; transform: translateY(-1px); box-shadow: 0 10px 26px var(--brand-glow); }
+
+.appnav-icon-btn {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: var(--bg-glass);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.appnav-icon-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+.appnav-dot {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--error);
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 700;
+}
+
+.appnav-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border-bright);
+  background: var(--brand-dim);
+  color: var(--text-primary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.appnav-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ── Popovers ── */
+.appnav-pop { position: relative; }
+
+.appnav-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 950;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  animation: appnav-pop 160ms var(--ease);
+}
+@keyframes appnav-pop {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.appnav-notifs { width: min(360px, calc(100vw - 2 * var(--shell-pad))); }
+.appnav-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.appnav-panel-head h2 { margin: 0; font-size: 0.95rem; }
+.appnav-linkbtn {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  background: none; border: 0; cursor: pointer;
+  color: var(--text-accent); font-size: 0.78rem; font-weight: 600;
+}
+.appnav-notif-list { max-height: min(60vh, 420px); overflow-y: auto; }
+.appnav-notif {
+  display: grid;
+  gap: 0.2rem;
+  width: 100%;
+  padding: 0.8rem 1rem;
+  text-align: left;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--border-dim);
+  cursor: pointer;
+  transition: background var(--dur) var(--ease);
+}
+.appnav-notif:hover { background: var(--bg-hover); }
+.appnav-notif.is-unread { background: var(--brand-dim); }
+.appnav-notif-title { font-size: 0.86rem; font-weight: 600; color: var(--text-primary); }
+.appnav-notif-body { font-size: 0.8rem; color: var(--text-secondary); overflow-wrap: anywhere; }
+.appnav-notif-time { font-size: 0.72rem; color: var(--text-muted); }
+.appnav-empty { padding: 1.5rem 1rem; margin: 0; text-align: center; color: var(--text-muted); font-size: 0.85rem; }
+
+.appnav-menu { width: min(250px, calc(100vw - 2 * var(--shell-pad))); padding: 0.4rem; }
+.appnav-menu-id { padding: 0.6rem 0.7rem; border-bottom: 1px solid var(--border); margin-bottom: 0.35rem; }
+.appnav-menu-name { margin: 0; font-size: 0.9rem; font-weight: 600; color: var(--text-primary); }
+.appnav-menu-mail { margin: 0.1rem 0 0; font-size: 0.75rem; color: var(--text-muted); overflow-wrap: anywhere; }
+.appnav-menu a,
+.appnav-menu button {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.6rem 0.7rem;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: none;
+  color: var(--text-secondary);
+  font-size: 0.87rem;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.appnav-menu a:hover,
+.appnav-menu button:hover { background: var(--bg-hover); color: var(--text-primary); }
+.appnav-signout { color: var(--error) !important; }
+
+/* ── Mobile tab bar (hidden on desktop) ── */
+.apptabs {
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 900;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-around;
+  gap: 0.25rem;
+  padding: 0.35rem 0.5rem calc(0.35rem + env(safe-area-inset-bottom, 0px));
+  background: color-mix(in srgb, var(--bg-secondary) 94%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-top: 1px solid var(--border);
+}
+.apptab {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  padding: 0.4rem 0.15rem;
+  border: 0;
+  border-radius: var(--r-md);
+  background: none;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+.apptab span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.apptab:hover { color: var(--text-secondary); }
+.apptab.is-active { color: var(--text-accent); background: var(--brand-dim); }
+.apptab-cta { color: #fff; }
+.apptab-cta-ring {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-top: -18px;
+  border-radius: 50%;
+  background: var(--brand-gradient);
+  color: #fff;
+  border: 3px solid var(--bg-secondary);
+  box-shadow: 0 8px 22px var(--brand-glow);
+}
+
+/* ── "More" bottom sheet ── */
+.appsheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 960;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: flex-end;
+  animation: appnav-fade 160ms var(--ease);
+}
+@keyframes appnav-fade { from { opacity: 0; } to { opacity: 1; } }
+.appsheet {
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border);
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
+  padding: 0.6rem var(--shell-pad) calc(1.2rem + var(--tabbar-h));
+  animation: appnav-rise 220ms var(--ease);
+}
+@keyframes appnav-rise { from { transform: translateY(14%); } to { transform: none; } }
+.appsheet-head { display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.5rem; }
+.appsheet-grip { width: 44px; height: 4px; border-radius: 999px; background: var(--border-bright); margin-inline: auto; }
+.appsheet-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  gap: 0.6rem;
+}
+.appsheet-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.9rem 0.5rem;
+  min-height: 84px;
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border);
+  background: var(--bg-card-2);
+  color: var(--text-secondary);
+  font-size: 0.76rem;
+  font-weight: 600;
+  text-align: center;
+}
+.appsheet-item:hover { color: var(--text-primary); border-color: var(--border-bright); }
+.appsheet-signout {
+  margin-top: 0.8rem;
+  width: 100%;
+  min-height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: var(--r-md);
+  border: 1px solid var(--error-b);
+  background: var(--error-bg);
+  color: var(--error);
+  font: 600 0.9rem/1 var(--font-sans);
+  cursor: pointer;
+}
+
+/* ── Breakpoints ─────────────────────────────────────────────────────────── */
+
+/* Phones: tab bar drives navigation, the top bar stays minimal. */
+@media (max-width: 899px) {
+  .appnav-links { display: none; }
+  .appnav-inner { min-height: 56px; gap: 0.5rem; }
+  .appnav-wordmark { font-size: 1rem; }
+}
+
+/* Tablet and up: real link row, no tab bar. */
+@media (min-width: 900px) {
+  .apptabs, .appsheet-backdrop { display: none; }
+  .appnav-send { display: inline-flex; }
+}
+
+/* Wide desktop: show the live balance too. */
+@media (min-width: 1180px) {
+  .appnav-balance { display: flex; }
+}
+
+/* Very narrow phones: drop the wordmark before anything can overflow. */
+@media (max-width: 380px) {
+  .appnav-wordmark { display: none; }
+  .apptab { font-size: 0.62rem; }
+}
+
+/* Page content clears the fixed tab bar whenever the nav is on screen. */
+body[data-appnav="on"] { padding-bottom: var(--tabbar-h); }
+@media (min-width: 900px) { body[data-appnav="on"] { padding-bottom: 0; } }

@@ -21,7 +21,7 @@
   left: 0;
   right: 0;
   height: 300px;
-  background: linear-gradient(135deg, #4c3b9e 0%, #2d1f6e 100%);
+  background: linear-gradient(135deg, var(--brand) 0%, #2d1f6e 100%);
   border-radius: 0 0 50% 50% / 0 0 4rem 4rem;
   z-index: 0;
 }
@@ -125,7 +125,7 @@
   left: 1.25rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #6b7280;
+  color: var(--text-muted);
   pointer-events: none;
   z-index: 1;
 }
@@ -136,26 +136,26 @@
   font-size: 1rem;
   border: 2px solid transparent;
   border-radius: 16px;
-  background: #1e2235;
-  color: #e2e8f0;
+  background: var(--bg-card-2);
+  color: var(--text-primary);
   transition: all 0.3s ease;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   font-family: inherit;
 }
 
 .search-input::placeholder {
-  color: #4a5568;
+  color: var(--text-secondary);
 }
 
 .search-input:hover {
-  background: #242840;
+  background: var(--bg-hover);
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
 }
 
 .search-input:focus {
   outline: none;
-  border-color: #7c5cbf;
-  background: #242840;
+  border-color: var(--brand-border);
+  background: var(--bg-hover);
   box-shadow: 0 0 0 4px rgba(124, 92, 191, 0.15), 0 6px 24px rgba(0, 0, 0, 0.35);
 }
 
@@ -173,7 +173,7 @@
 }
 
 .summary-card {
-  background: #1a1d30;
+  background: var(--bg-card);
   border-radius: 20px;
   padding: 1.75rem;
   display: flex;
@@ -190,7 +190,7 @@
 }
 
 .summary-card.total-due {
-  background: linear-gradient(135deg, #4c3b9e 0%, #2d1f6e 100%);
+  background: linear-gradient(135deg, var(--brand) 0%, #2d1f6e 100%);
   border-color: rgba(124, 92, 191, 0.3);
 }
 
@@ -199,7 +199,7 @@
 }
 
 .summary-card.pending-count {
-  background: #1a1d30;
+  background: var(--bg-card);
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
@@ -216,7 +216,7 @@
 
 .summary-card.pending-count .summary-icon {
   background: rgba(124, 92, 191, 0.15);
-  color: #a78bfa;
+  color: var(--brand-2);
 }
 
 .summary-info {
@@ -233,7 +233,7 @@
 }
 
 .summary-card.pending-count .summary-label {
-  color: #718096;
+  color: var(--text-secondary);
 }
 
 .summary-amount,
@@ -245,7 +245,7 @@
 }
 
 .summary-card.pending-count .summary-count {
-  color: #e2e8f0;
+  color: var(--text-primary);
 }
 
 /* ========================================
@@ -267,15 +267,15 @@
 .section-title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #e2e8f0;
+  color: var(--text-primary);
   margin: 0;
 }
 
 .bills-count {
   font-size: 0.875rem;
-  color: #718096;
+  color: var(--text-secondary);
   font-weight: 500;
-  background: #1a1d30;
+  background: var(--bg-card);
   padding: 0.5rem 1rem;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
@@ -292,7 +292,7 @@
 }
 
 .bill-card {
-  background: #1a1d30;
+  background: var(--bg-card);
   border-radius: 20px;
   padding: 1.75rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
@@ -318,13 +318,13 @@
 .bill-card:hover {
   transform: translateY(-6px);
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
-  border-color: #7c5cbf;
-  background: #1e2235;
+  border-color: var(--brand-border);
+  background: var(--bg-card-2);
 }
 
 .bill-card.overdue {
   border-color: rgba(252, 129, 129, 0.35);
-  background: linear-gradient(135deg, #1a1d30 0%, #241520 100%);
+  background: linear-gradient(135deg, var(--bg-card) 0%, #241520 100%);
 }
 
 .bill-card.overdue:hover {
@@ -348,7 +348,7 @@
   top: 1rem;
   right: 1rem;
   background: rgba(252, 129, 129, 0.2);
-  color: #fc8181;
+  color: var(--error);
   border: 1px solid rgba(252, 129, 129, 0.35);
   padding: 0.375rem 0.75rem;
   border-radius: 8px;
@@ -381,7 +381,7 @@
   width: 56px;
   height: 56px;
   border-radius: 14px;
-  background: #252840;
+  background: var(--bg-hover);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -399,7 +399,7 @@
 .bill-name {
   font-size: 1.125rem;
   font-weight: 700;
-  color: #e2e8f0;
+  color: var(--text-primary);
   margin: 0 0 0.25rem;
   white-space: nowrap;
   overflow: hidden;
@@ -408,7 +408,7 @@
 
 .bill-category {
   font-size: 0.875rem;
-  color: #718096;
+  color: var(--text-secondary);
   font-weight: 500;
 }
 
@@ -416,7 +416,7 @@
 .bill-details {
   margin-bottom: 1.25rem;
   padding: 1rem;
-  background: #13152a;
+  background: var(--bg-secondary);
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.04);
 }
@@ -425,14 +425,14 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #9ca3af;
+  color: var(--text-muted);
   font-size: 0.875rem;
   margin-bottom: 0.5rem;
 }
 
 .bill-due svg {
   flex-shrink: 0;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .bill-due-date {
@@ -441,7 +441,7 @@
 
 .days-until {
   font-size: 0.8125rem;
-  color: #68d391;
+  color: var(--success);
   font-weight: 600;
   padding: 0.25rem 0.625rem;
   background: rgba(104, 211, 145, 0.1);
@@ -451,13 +451,13 @@
 }
 
 .days-until.urgent {
-  color: #f6ad55;
+  color: var(--warning);
   background: rgba(246, 173, 85, 0.1);
   border-color: rgba(246, 173, 85, 0.2);
 }
 
 .days-until.overdue-text {
-  color: #fc8181;
+  color: var(--error);
   background: rgba(252, 129, 129, 0.1);
   border-color: rgba(252, 129, 129, 0.2);
 }
@@ -473,12 +473,12 @@
 .bill-amount {
   font-size: 1.75rem;
   font-weight: 700;
-  color: #f1f5f9;
+  color: var(--bg-card-2);
   letter-spacing: -0.02em;
 }
 
 .pay-button {
-  background: linear-gradient(135deg, #6d4fc4 0%, #4c3b9e 100%);
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand) 100%);
   color: white;
   border: none;
   border-radius: 12px;
@@ -497,7 +497,7 @@
 .pay-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(76, 59, 158, 0.6);
-  background: linear-gradient(135deg, #7c5cbf 0%, #5a47b0 100%);
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand) 100%);
 }
 
 .pay-button:active {
@@ -506,7 +506,7 @@
 
 .paid-badge {
   background: rgba(104, 211, 145, 0.1);
-  color: #68d391;
+  color: var(--success);
   border: 1px solid rgba(104, 211, 145, 0.25);
   padding: 0.625rem 1rem;
   border-radius: 12px;
@@ -524,7 +524,7 @@
 .empty-state {
   text-align: center;
   padding: 4rem 2rem;
-  background: #1a1d30;
+  background: var(--bg-card);
   border-radius: 20px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -534,25 +534,25 @@
   width: 80px;
   height: 80px;
   margin: 0 auto 1.5rem;
-  background: #252840;
+  background: var(--bg-hover);
   border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #4a5568;
+  color: var(--text-secondary);
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .empty-title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #e2e8f0;
+  color: var(--text-primary);
   margin: 0 0 0.5rem;
 }
 
 .empty-message {
   font-size: 1rem;
-  color: #718096;
+  color: var(--text-secondary);
   margin: 0;
 }
 
@@ -579,7 +579,7 @@
 }
 
 .confirmation-card {
-  background: #1a1d30;
+  background: var(--bg-card);
   border-radius: 24px;
   padding: 3rem 2.5rem;
   max-width: 500px;
@@ -604,7 +604,7 @@
   width: 80px;
   height: 80px;
   margin: 0 auto 1.5rem;
-  background: linear-gradient(135deg, #6d4fc4 0%, #4c3b9e 100%);
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand) 100%);
   border-radius: 20px;
   display: flex;
   align-items: center;
@@ -626,20 +626,20 @@
 .confirmation-title {
   font-size: 2rem;
   font-weight: 700;
-  color: #f1f5f9;
+  color: var(--bg-card-2);
   margin: 0 0 0.5rem;
   text-align: center;
 }
 
 .confirmation-subtitle {
   font-size: 1rem;
-  color: #718096;
+  color: var(--text-secondary);
   margin: 0 0 2rem;
   text-align: center;
 }
 
 .confirmation-details {
-  background: #13152a;
+  background: var(--bg-secondary);
   border-radius: 16px;
   padding: 1.5rem;
   margin-bottom: 2rem;
@@ -666,13 +666,13 @@
 
 .detail-label {
   font-size: 0.9375rem;
-  color: #718096;
+  color: var(--text-secondary);
   font-weight: 500;
 }
 
 .detail-value {
   font-size: 1rem;
-  color: #e2e8f0;
+  color: var(--text-primary);
   font-weight: 600;
   text-align: right;
 }
@@ -680,7 +680,7 @@
 .detail-value.amount {
   font-size: 1.75rem;
   font-weight: 700;
-  color: #a78bfa;
+  color: var(--brand-2);
 }
 
 .confirmation-actions {
@@ -692,7 +692,7 @@
 .confirm-button {
   width: 100%;
   padding: 1rem 1.5rem;
-  background: linear-gradient(135deg, #6d4fc4 0%, #4c3b9e 100%);
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand) 100%);
   color: white;
   border: none;
   border-radius: 12px;
@@ -710,7 +710,7 @@
 .confirm-button:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(76, 59, 158, 0.65);
-  background: linear-gradient(135deg, #7c5cbf 0%, #5a47b0 100%);
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand) 100%);
 }
 
 .confirm-button:active:not(:disabled) {
@@ -730,7 +730,7 @@
   border-radius: 12px;
   font-size: 1rem;
   font-weight: 600;
-  color: #9ca3af;
+  color: var(--text-muted);
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -738,7 +738,7 @@
 .cancel-button:hover:not(:disabled) {
   border-color: rgba(255, 255, 255, 0.2);
   background: rgba(255, 255, 255, 0.04);
-  color: #e2e8f0;
+  color: var(--text-primary);
 }
 
 .cancel-button:disabled {
@@ -836,13 +836,13 @@
 .success-title {
   font-size: 2rem;
   font-weight: 700;
-  color: #f1f5f9;
+  color: var(--bg-card-2);
   margin: 0 0 1rem;
 }
 
 .success-message {
   font-size: 1.125rem;
-  color: #718096;
+  color: var(--text-secondary);
   margin: 0 auto;
   line-height: 1.6;
   max-width: 400px;
@@ -944,7 +944,7 @@
 .confirm-button:focus-visible,
 .back-button:focus-visible,
 .search-input:focus-visible {
-  outline: 3px solid #7c5cbf;
+  outline: 3px solid var(--brand);
   outline-offset: 2px;
 }
 
@@ -954,4 +954,100 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+/* ============================================================================
+   Live-bills additions + responsive hardening.
+   ============================================================================ */
+
+.pay-bills-container { padding-inline: var(--shell-pad); max-width: var(--shell-max); margin-inline: auto; }
+.pay-bills-header { gap: 1rem; flex-wrap: wrap; }
+.header-content { min-width: 0; flex: 1 1 220px; }
+
+.add-bill-button {
+  display: inline-flex; align-items: center; gap: .45rem;
+  min-height: 44px; padding: 0 1.1rem; border-radius: var(--r-md);
+  background: var(--brand-gradient); color: #fff; border: 0;
+  font: 600 .875rem/1 var(--font-sans); cursor: pointer;
+  box-shadow: 0 6px 18px var(--brand-glow);
+}
+.add-bill-button:hover { filter: brightness(1.06); }
+
+.bills-banner {
+  display: flex; align-items: center; gap: .6rem; flex-wrap: wrap;
+  margin-bottom: 1.25rem; padding: .8rem 1rem; border-radius: var(--r-md);
+  background: var(--error-bg); border: 1px solid var(--error-b); color: var(--error);
+  font-size: .875rem;
+}
+.bills-banner button {
+  margin-left: auto; display: inline-flex; align-items: center; gap: .35rem;
+  min-height: 36px; padding: 0 .8rem; border-radius: var(--r-sm); cursor: pointer;
+  background: transparent; border: 1px solid currentColor; color: inherit;
+  font: 600 .78rem/1 var(--font-sans);
+}
+
+.add-bill-form {
+  margin-bottom: 1.5rem; padding: 1.25rem; border-radius: var(--r-lg);
+  background: var(--bg-card); border: 1px solid var(--border);
+}
+.add-bill-grid {
+  display: grid; gap: .9rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+.add-bill-grid label { display: flex; flex-direction: column; gap: .35rem; min-width: 0; }
+.add-bill-grid span { font-size: .78rem; font-weight: 600; color: var(--text-secondary); }
+.add-bill-grid input,
+.add-bill-grid select {
+  width: 100%; min-height: 44px; padding: 0 .8rem; border-radius: var(--r-md);
+  background: var(--bg-secondary); border: 1px solid var(--border);
+  color: var(--text-primary); font: 400 .9rem/1 var(--font-sans);
+}
+.add-bill-grid input:focus,
+.add-bill-grid select:focus {
+  outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-glow);
+}
+.add-bill-submit {
+  margin-top: 1rem; display: inline-flex; align-items: center; gap: .45rem;
+  min-height: 44px; padding: 0 1.3rem; border-radius: var(--r-md);
+  background: var(--brand-gradient); color: #fff; border: 0;
+  font: 600 .9rem/1 var(--font-sans); cursor: pointer;
+}
+.add-bill-submit:disabled { opacity: .6; cursor: not-allowed; }
+
+.bill-delete {
+  margin-left: auto; display: grid; place-items: center;
+  width: 34px; height: 34px; border-radius: var(--r-sm); flex-shrink: 0;
+  background: transparent; border: 1px solid var(--border);
+  color: var(--text-muted); cursor: pointer;
+}
+.bill-delete:hover { color: var(--error); border-color: var(--error-b); background: var(--error-bg); }
+
+.pay-button:disabled { opacity: .5; cursor: not-allowed; }
+
+.bill-skeleton {
+  height: 190px; border-radius: var(--r-lg);
+  background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-hover) 37%, var(--bg-card) 63%);
+  background-size: 400% 100%;
+  animation: bill-shimmer 1.3s ease infinite;
+}
+@keyframes bill-shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+
+/* ── Responsive ── */
+.bill-info { min-width: 0; }
+.bill-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bill-footer { flex-wrap: wrap; gap: .6rem; }
+
+@media (max-width: 768px) {
+  .add-bill-button { width: 100%; justify-content: center; }
+  .bills-summary { grid-template-columns: 1fr; }
+  .confirmation-actions { flex-direction: column; }
+  .confirmation-actions button { width: 100%; min-height: 46px; }
+  .detail-row { flex-wrap: wrap; gap: .25rem; }
+}
+
+@media (max-width: 480px) {
+  .add-bill-grid { grid-template-columns: 1fr; }
+  .bills-grid { grid-template-columns: 1fr; }
+  .bill-footer { flex-direction: column; align-items: stretch; }
+  .pay-button { width: 100%; justify-content: center; min-height: 44px; }
+  .bills-banner button { margin-left: 0; width: 100%; justify-content: center; }
 }

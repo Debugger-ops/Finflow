@@ -82,7 +82,7 @@
   gap: 0.75rem;
   background: rgba(52, 211, 153, 0.12);
   border: 1px solid rgba(52, 211, 153, 0.3);
-  color: #34d399;
+  color: var(--success);
   padding: 1rem 1.5rem;
   border-radius: 14px;
   margin-bottom: 1.5rem;
@@ -238,7 +238,7 @@
    Form
 ======================================== */
 .add-card-form {
-  background: #1a1d30;
+  background: var(--bg-card);
   border-radius: 24px;
   padding: 2rem;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
@@ -257,7 +257,7 @@
 .form-group label {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #9ca3af;
+  color: var(--text-muted);
   letter-spacing: 0.02em;
 }
 
@@ -267,26 +267,26 @@
   font-size: 1rem;
   border: 2px solid rgba(255, 255, 255, 0.07);
   border-radius: 12px;
-  background: #13152a;
-  color: #e2e8f0;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
   transition: all 0.3s ease;
   font-family: inherit;
   box-sizing: border-box;
 }
 
 .form-group input::placeholder {
-  color: #374151;
+  color: var(--text-muted);
 }
 
 .form-group input:hover {
   border-color: rgba(255, 255, 255, 0.12);
-  background: #181b30;
+  background: var(--bg-card);
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #7e27c4;
-  background: #181b30;
+  border-color: var(--brand);
+  background: var(--bg-card);
   box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.1);
 }
 
@@ -299,7 +299,7 @@
 .input-icon {
   position: absolute;
   left: 1rem;
-  color: #4b5563;
+  color: var(--text-muted);
   pointer-events: none;
   z-index: 1;
   transition: color 0.3s ease;
@@ -310,7 +310,7 @@
 }
 
 .input-wrapper:focus-within .input-icon {
-  color: #8324b3;
+  color: var(--brand-2);
 }
 
 .form-row {
@@ -326,7 +326,7 @@
   display: flex;
   align-items: center;
   gap: 0.625rem;
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 0.8125rem;
   font-weight: 500;
   padding: 0.75rem 1rem;
@@ -336,7 +336,7 @@
 }
 
 .security-note svg {
-  color: #5930a5;
+  color: var(--brand);
   flex-shrink: 0;
 }
 
@@ -381,7 +381,7 @@
 .back-button:focus-visible,
 .submit-button:focus-visible,
 .form-group input:focus-visible {
-  outline: 3px solid #6634d3;
+  outline: 3px solid var(--brand);
   outline-offset: 2px;
 }
 

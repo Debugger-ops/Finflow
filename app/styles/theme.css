@@ -1,11 +1,10 @@
 /* ============================================================================
-   FinFlow — Canonical design tokens (single source of truth)
+   FinFlow — Canonical design tokens + responsive foundations
    ----------------------------------------------------------------------------
-   Every page used to declare its own :root with slightly different colors,
-   which is why the UI felt inconsistent. These tokens are the shared system.
-   To adopt them in a page, delete that page's local :root block — it will then
-   inherit everything below. Names match the de-facto set already used by
-   dashboard.css so existing pages keep working during the migration.
+   SINGLE SOURCE OF TRUTH. Pages must not declare their own :root block: the
+   alias layer below maps every legacy per-page variable name onto these tokens,
+   so Appearance settings (light mode, theme colour, font size, density) reach
+   every screen instead of stopping at the page that redefined them.
    ============================================================================ */
 
 :root {
@@ -15,23 +14,33 @@
   --bg-card:       #11162a;
   --bg-card-2:     #161d34;
   --bg-hover:      #1d2542;
+  --bg-active:     #243056;
   --bg-glass:      rgba(255, 255, 255, 0.03);
 
   /* ---- Text ---- */
   --text-primary:   #eef1fb;
-  --text-secondary: #9aa6c9;
-  --text-muted:     #5b648c;
+  --text-secondary: #9aa6cc;
+  /* Raised from #5f6a92, which sat at ~3.5:1 on the dark surfaces — below the
+     WCAG AA 4.5:1 minimum for body text. #7a86ad clears 5:1 on every surface
+     while staying visibly quieter than --text-secondary. */
+  --text-muted:     #7a86ad;
+  --text-subtle:    #5f6a92;
   --text-accent:    #a5b4fc;
+  --text-inverse:   #060912;
 
   /* ---- Borders ---- */
   --border:        rgba(255, 255, 255, 0.08);
   --border-bright: rgba(165, 180, 252, 0.22);
+  --border-dim:    rgba(255, 255, 255, 0.055);
+  --border-subtle: rgba(255, 255, 255, 0.09);
 
-  /* ---- Brand ---- */
+  /* ---- Brand (‑rgb channels let aliases tint with the active theme) ---- */
   --brand:          #6d7cff;
+  --brand-rgb:      109 124 255;
   --brand-2:        #a78bfa;
+  --brand-2-rgb:    167 139 250;
   --brand-gradient: linear-gradient(135deg, #6d7cff, #9b6bff, #c084fc);
-  --brand-glow:     rgba(109, 126, 255, 0.22);
+  --brand-glow:     rgb(var(--brand-rgb) / 0.22);
 
   /* ---- Semantic ---- */
   --success: #34d399; --success-bg: rgba(52, 211, 153, 0.10); --success-b: rgba(52, 211, 153, 0.25);
@@ -42,9 +51,13 @@
   /* ---- Accent palette (charts, tags) ---- */
   --emerald: #34d399; --blue: #60a5fa; --purple: #a78bfa;
   --amber:   #fbbf24; --red:  #fb7185; --indigo: #818cf8;
+  --emerald-bg: rgba(52,211,153,.12); --blue-bg: rgba(96,165,250,.12);
+  --purple-bg:  rgba(167,139,250,.12); --amber-bg: rgba(251,191,36,.12);
+  --red-bg:     rgba(251,113,133,.12); --indigo-bg: rgba(129,140,248,.12);
+  --accent-cyan: #38bdf8; --accent-violet: #a78bfa;
 
   /* ---- Radius ---- */
-  --r-sm: 6px; --r-md: 12px; --r-lg: 18px; --r-xl: 24px; --r-2xl: 32px;
+  --r-xs: 4px; --r-sm: 8px; --r-md: 12px; --r-lg: 18px; --r-xl: 24px; --r-2xl: 32px;
   --radius: var(--r-lg);
 
   /* ---- Spacing scale ---- */
@@ -52,9 +65,10 @@
   --space-5: 24px; --space-6: 32px; --space-8: 48px;
 
   /* ---- Elevation ---- */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
-  --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.5);
+  --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.40);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.55);
+  --shadow-xl: 0 24px 60px rgba(0, 0, 0, 0.65);
   --shadow-glow: 0 0 0 1px var(--border-bright), 0 12px 40px var(--brand-glow);
 
   /* ---- Typography (wired to next/font in layout.tsx) ---- */
@@ -63,7 +77,161 @@
 
   /* ---- Motion ---- */
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --dur: 200ms;
+
+  /* ---- Layout rhythm (drives the responsive shell) ---- */
+  --shell-max:    1400px;
+  --shell-pad:    clamp(0.9rem, 3.5vw, 2rem);
+  --topnav-h:     64px;
+  --tabbar-h:     calc(60px + env(safe-area-inset-bottom, 0px));
+}
+
+/* ============================================================================
+   ALIAS LAYER — legacy per-page variable names mapped onto the tokens above.
+   Adding a name here is what let each page's local :root block be deleted.
+   ============================================================================ */
+:root {
+  /* surfaces */
+  --bg:          var(--bg-primary);
+  --bg-base:     var(--bg-primary);
+  --background:  var(--bg-primary);
+  --bg-2:        var(--bg-secondary);
+  --bg-surface:  var(--bg-secondary);
+  --surface:     var(--bg-card);
+  --bg-3:        var(--bg-card);
+  --bg-4:        var(--bg-card-2);
+  --bg-card-alt: var(--bg-card-2);
+  --surface-light: var(--bg-card-2);
+  --bg-tertiary: var(--bg-hover);
+  --glass:     rgb(var(--brand-rgb) / 0.04);
+  --glass-hv:  rgb(var(--brand-rgb) / 0.08);
+  --glass-bd:  rgb(var(--brand-rgb) / 0.15);
+  --glass-act: rgb(var(--brand-rgb) / 0.28);
+
+  /* text */
+  --text: var(--text-primary);
+  --t1:   var(--text-primary);
+  --t2:   var(--text-secondary);
+  --t3:   var(--text-muted);
+  --white: var(--text-primary);
+  --slate-100: var(--text-primary);
+  --slate-200: #c2cce4;
+  --slate-300: var(--text-secondary);
+  --slate-400: #7a86ad;
+  --slate-500: var(--text-muted);
+
+  /* borders */
+  --border-color: var(--border);
+  --border-hover: var(--border-bright);
+  --border-cyan:  rgba(56, 189, 248, 0.22);
+  --border-gold:  rgba(245, 200, 66, 0.22);
+
+  /* brand aliases — all tint with the active theme colour */
+  --primary:        var(--brand);
+  --primary-color:  var(--brand);
+  --primary-dark:   var(--brand);
+  --primary-hover:  var(--brand-2);
+  --secondary:      var(--brand-2);
+  --secondary-color: var(--brand-2);
+  --brand-light:  var(--text-accent);
+  --brand-dim:    rgb(var(--brand-rgb) / 0.12);
+  --brand-border: rgb(var(--brand-rgb) / 0.25);
+  --brand-mid:    var(--brand);
+  --brand-end:    var(--brand-2);
+  --brand-primary: var(--accent-cyan);
+  --ac:        var(--brand-2);
+  --av:        var(--brand-2);
+  --ac-bright: var(--brand-2);
+  --ac-dim:    rgb(var(--brand-2-rgb) / 0.12);
+  --ac-glow:   rgb(var(--brand-2-rgb) / 0.28);
+  --ac-press:  var(--brand);
+  --violet:     var(--brand-2);
+  --violet-dim: rgb(var(--brand-2-rgb) / 0.12);
+  --grad-primary: var(--brand-gradient);
+  --grad-gold:    linear-gradient(135deg, #fbbf24, #fcd34d);
+  --grad-hero-glow: radial-gradient(ellipse 80% 60% at 50% -10%, rgb(var(--brand-rgb) / 0.14) 0%, transparent 65%);
+  --grad-cta-glow:  radial-gradient(ellipse 70% 80% at 50% 50%, rgb(var(--brand-rgb) / 0.12) 0%, transparent 65%);
+
+  /* landing ink / accent ramp */
+  --ink-950: #04060d; --ink-900: var(--bg-primary); --ink-800: var(--bg-secondary);
+  --ink-700: var(--bg-card); --ink-600: var(--bg-card-2); --ink-400: #2a3350; --ink-200: #3d4a6b;
+  --cyan-400: #38bdf8; --cyan-300: #67d3fb; --cyan-200: #9ce0fc; --cyan-glow: rgba(56,189,248,0.18);
+  --gold-400: #fbbf24; --gold-300: #fcd34d;
+  --green-400: var(--success); --red-400: var(--error);
+  --c-emerald: var(--emerald); --c-amber: var(--amber); --c-blue: var(--blue);
+  --c-purple:  var(--purple);  --c-red:   var(--red);
+
+  /* semantic aliases */
+  --success-color: var(--success);
+  --warning-color: var(--warning);
+  --danger-color:  var(--error);
+  --danger-hover:  #e11d48;
+  --accent:        var(--warning);
+  --positive: var(--success); --positive-bg: var(--success-bg); --positive-border: var(--success-b);
+  --negative: var(--error);   --negative-bg: var(--error-bg);   --negative-border: var(--error-b);
+  --warning-border: var(--warning-b);
+  --info-border: var(--info-b);
+  --danger: var(--error); --danger-dim: var(--error-bg);
+  --warn:   #fb923c;      --warn-dim:   rgba(251,146,60,0.12);
+  --ok:     var(--success); --ok-dim:    var(--success-bg);
+  --pink: #e879f9; --pink-dim: rgba(232,121,249,0.10);
+  --blue-dim: rgba(129,140,248,0.10);
+
+  /* sell (amber) accent — sell-stocks screen */
+  --sell: #f97316; --sell-light: #fb923c;
+  --sell-dim: rgba(249,115,22,0.12); --sell-border: rgba(249,115,22,0.28);
+  --sell-glow: 0 0 40px rgba(249,115,22,0.15);
+
+  /* goal category palette */
+  --cat-emergency: #fb7185; --cat-travel: #60a5fa; --cat-transport: #34d399;
+  --cat-housing:   #a78bfa; --cat-education: #fbbf24; --cat-health: #f472b6;
+  --cat-business:  #818cf8; --cat-tech: #38bdf8;
+
+  /* radii aliases */
+  --r1: 8px; --r2: 14px; --r3: 20px; --r4: 28px;
+  --radius-sm: var(--r-sm); --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg); --radius-xl: var(--r-xl);
+
+  /* spacing aliases (respond to compact density) */
+  --sp-xs: .25rem; --sp-sm: .5rem; --sp-md: 1rem; --sp-lg: 1.5rem; --sp-xl: 2rem; --sp-2xl: 2.75rem;
+  --s-xs: .25rem;  --s-sm: .5rem;  --s-md: 1rem;  --s-lg: 1.5rem;  --s-xl: 2rem;  --s-2xl: 3rem;
+
+  /* motion aliases */
+  --t-fast:   120ms var(--ease);
+  --t-base:   200ms var(--ease);
+  --t-slow:   350ms var(--ease);
+  --t-spring: 420ms var(--spring);
+  --transition: all 200ms var(--ease);
+
+  /* font aliases */
+  --font-body: var(--font-sans);
+  --ff-body:   var(--font-sans);
+  --ff-display: var(--font-display);
+  --ff-serif:  Georgia, 'Times New Roman', serif;
+  --ff-mono:   ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* notification system */
+  --notif-bg-primary: var(--bg-primary); --notif-bg-secondary: var(--bg-secondary);
+  --notif-bg-card: var(--bg-card); --notif-bg-hover: var(--bg-hover);
+  --notif-backdrop: rgba(0,0,0,0.5);
+  --notif-text-primary: var(--text-primary); --notif-text-secondary: var(--text-secondary);
+  --notif-text-muted: var(--text-muted);
+  --notif-border-color: var(--border); --notif-border-light: var(--border-dim);
+  --notif-success: var(--success); --notif-success-bg: var(--success-bg); --notif-success-border: var(--success-b);
+  --notif-warning: var(--warning); --notif-warning-bg: var(--warning-bg); --notif-warning-border: var(--warning-b);
+  --notif-info: var(--brand); --notif-info-bg: var(--brand-dim); --notif-info-border: var(--brand-border);
+  --notif-error: var(--error); --notif-error-bg: var(--error-bg); --notif-error-border: var(--error-b);
+  --notif-primary: var(--brand); --notif-primary-hover: var(--brand-2);
+  --notif-spacing-xs: .25rem; --notif-spacing-sm: .5rem; --notif-spacing-md: 1rem;
+  --notif-spacing-lg: 1.5rem; --notif-spacing-xl: 2rem;
+  --notif-radius-sm: .5rem; --notif-radius-md: .75rem; --notif-radius-lg: 1rem;
+  --notif-shadow-sm: var(--shadow-sm); --notif-shadow-md: var(--shadow-md);
+  --notif-shadow-lg: var(--shadow-lg); --notif-shadow-xl: var(--shadow-xl);
+  --notif-transition-fast: 150ms ease-in-out;
+  --notif-transition-base: 200ms ease-in-out;
+  --notif-transition-slow: 300ms ease-in-out;
 }
 
 /* ============================================================================
@@ -74,6 +242,7 @@
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   padding: 10px 18px; border-radius: var(--r-md); border: 1px solid transparent;
   font: 600 0.95rem/1 var(--font-sans); cursor: pointer;
+  min-height: 44px;
   transition: transform var(--dur) var(--ease), background var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
 }
 .btn:active { transform: translateY(1px); }
@@ -105,10 +274,6 @@
 .badge-warning { color: var(--warning); background: var(--warning-bg); border-color: var(--warning-b); }
 .badge-error   { color: var(--error);   background: var(--error-bg);   border-color: var(--error-b); }
 
-/* ============================================================================
-   Modern polish — applied app-wide. Low-risk additive rules only.
-   ============================================================================ */
-
 /* Subtle brand depth behind every page (shows through transparent layouts). */
 body::before {
   content: "";
@@ -117,42 +282,93 @@ body::before {
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(60% 50% at 50% -8%, rgba(109, 124, 255, 0.10), transparent 70%),
-    radial-gradient(45% 40% at 100% 0%, rgba(167, 139, 250, 0.06), transparent 70%);
+    radial-gradient(60% 50% at 50% -8%, rgb(var(--brand-rgb) / 0.10), transparent 70%),
+    radial-gradient(45% 40% at 100% 0%, rgb(var(--brand-2-rgb) / 0.06), transparent 70%);
 }
 
-/* Refined interactive feel for the shared primitives. */
 .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 10px 30px var(--brand-glow); }
 .card { transition: transform var(--dur) var(--ease), border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease); }
 .card:hover { border-color: var(--border-bright); box-shadow: var(--shadow-lg); }
 
 /* ============================================================================
-   APPEARANCE SETTINGS — driven by data-* attributes on <html>.
-   Set by app/libs/appearance.ts (AppearanceSync + the profile page).
-   [data-mode] dark|light  ·  [data-theme] default|blue|green|purple
-   [data-font-size] small|medium|large|xlarge  ·  [data-density] comfortable|compact
-   The attribute selectors outrank each page's plain :root, so these win app-wide.
+   RESPONSIVE FOUNDATIONS — shared by every screen.
    ============================================================================ */
 
-/* ---- Theme Color: re-tint the brand everywhere ---- */
+/* Nothing may push the page sideways. `clip` (not `hidden`) keeps
+   position: sticky working inside the page. */
+body { overflow-x: clip; }
+
+/* Content shell used by the app pages, gutter scales with the viewport. */
+.page-shell {
+  width: 100%;
+  max-width: var(--shell-max);
+  margin-inline: auto;
+  padding-inline: var(--shell-pad);
+}
+
+/* body[data-appnav="on"] already reserves the tab-bar height (AppNav.css);
+   this only adds breathing room above it. */
+.has-app-nav { padding-bottom: 1.25rem; }
+@media (min-width: 900px) { .has-app-nav { padding-bottom: 2rem; } }
+
+/* Wide content (tables, charts, chip rows) scrolls inside itself. */
+.scroll-x {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+}
+.scroll-x > * { min-width: max-content; }
+
+/* Grid/flex children default to min-width:auto, which is the usual cause of a
+   blown-out row on a phone. Opt back into shrinking. */
+.min-0 { min-width: 0; }
+
+/* Long account numbers, emails and notes wrap instead of overflowing. */
+.truncate { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.break-anywhere { overflow-wrap: anywhere; word-break: break-word; }
+
+/* Media and embeds never exceed their column. */
+img, svg, video, canvas, iframe { max-width: 100%; }
+table { max-width: 100%; }
+
+/* Comfortable tap targets on touch devices. */
+@media (hover: none) and (pointer: coarse) {
+  button, a[role="button"], .btn, [class*="tab-"], input[type="checkbox"], input[type="radio"] {
+    min-height: 44px;
+  }
+}
+
+/* Inputs must never trigger the iOS zoom-on-focus (fires below 16px). */
+@media (max-width: 768px) {
+  input, select, textarea { font-size: max(16px, 1rem); }
+}
+
+/* ============================================================================
+   APPEARANCE SETTINGS — driven by data-* attributes on <html>.
+   ============================================================================ */
+
 :root[data-theme="blue"] {
-  --brand: #3b82f6; --brand-2: #22d3ee;
+  --brand: #3b82f6; --brand-rgb: 59 130 246;
+  --brand-2: #22d3ee; --brand-2-rgb: 34 211 238;
   --brand-gradient: linear-gradient(135deg, #3b82f6, #38bdf8, #22d3ee);
-  --brand-glow: rgba(59, 130, 246, 0.22);
   --text-accent: #7dd3fc; --border-bright: rgba(59, 130, 246, 0.30);
 }
 :root[data-theme="green"] {
-  --brand: #10b981; --brand-2: #34d399;
+  --brand: #10b981; --brand-rgb: 16 185 129;
+  --brand-2: #34d399; --brand-2-rgb: 52 211 153;
   --brand-gradient: linear-gradient(135deg, #059669, #10b981, #34d399);
-  --brand-glow: rgba(16, 185, 129, 0.22);
   --text-accent: #6ee7b7; --border-bright: rgba(16, 185, 129, 0.30);
 }
 :root[data-theme="purple"] {
-  --brand: #a855f7; --brand-2: #c084fc;
+  --brand: #a855f7; --brand-rgb: 168 85 247;
+  --brand-2: #c084fc; --brand-2-rgb: 192 132 252;
   --brand-gradient: linear-gradient(135deg, #9333ea, #a855f7, #c084fc);
-  --brand-glow: rgba(168, 85, 247, 0.22);
   --text-accent: #d8b4fe; --border-bright: rgba(168, 85, 247, 0.30);
 }
+
+/* The top bar is shorter on phones; sticky page headers offset from this. */
+@media (max-width: 899px) { :root { --topnav-h: 56px; } }
 
 /* ---- Font Size: scales rem-based sizing + base text across the app ---- */
 :root[data-font-size="small"]  { font-size: 14.5px; }
@@ -166,42 +382,45 @@ body::before {
   --space-5: 18px; --space-6: 24px; --space-8: 36px;
   --sp-xs: .18rem; --sp-sm: .375rem; --sp-md: .7rem; --sp-lg: 1.05rem; --sp-xl: 1.4rem; --sp-2xl: 1.9rem;
   --s-xs: .18rem; --s-sm: .375rem; --s-md: .7rem; --s-lg: 1.05rem; --s-xl: 1.4rem; --s-2xl: 1.9rem;
+  --shell-pad: clamp(0.7rem, 2.5vw, 1.35rem);
 }
 
-/* ---- Light mode: flip the surface/text/border tokens (brand stays) ---- */
+/* ---- Light mode: flip surfaces/text/borders; the alias layer follows ---- */
 :root[data-mode="light"] {
-  /* surfaces */
-  --bg-primary: #f4f6fc; --bg: #f4f6fc; --bg-base: #f4f6fc; --background: #f4f6fc;
-  --bg-secondary: #ffffff; --bg-surface: #ffffff; --surface: #ffffff; --bg-2: #ffffff;
-  --bg-card: #ffffff; --bg-3: #ffffff; --notif-bg-secondary: #ffffff;
-  --bg-card-2: #eef1f8; --bg-card-alt: #eef1f8; --bg-4: #eef1f8; --surface-light: #eef1f8;
-  --notif-bg-primary: #f4f6fc; --notif-bg-card: #ffffff;
-  --bg-hover: #e6ebf5; --bg-active: #dde4f1; --bg-tertiary: #e6ebf5; --notif-bg-hover: #e6ebf5;
-  --bg-glass: rgba(15, 23, 42, 0.03); --glass: rgba(15, 23, 42, 0.03);
-  --glass-hv: rgba(15, 23, 42, 0.06); --glass-bd: rgba(15, 23, 42, 0.12); --glass-act: rgba(109, 124, 255, 0.16);
+  --bg-primary:   #f4f6fc;
+  --bg-secondary: #ffffff;
+  --bg-card:      #ffffff;
+  --bg-card-2:    #eef1f8;
+  --bg-hover:     #e6ebf5;
+  --bg-active:    #dde4f1;
+  --bg-glass:     rgba(15, 23, 42, 0.03);
+
+  --text-primary:   #0c1020;
+  --text-secondary: #44506e;
+  --text-muted:     #6b7799;
+  --text-subtle:    #8793b3;
+  --text-inverse:   #ffffff;
+
+  --border:        rgba(12, 16, 32, 0.10);
+  --border-bright: rgb(var(--brand-rgb) / 0.40);
+  --border-dim:    rgba(12, 16, 32, 0.06);
+  --border-subtle: rgba(12, 16, 32, 0.10);
+
   /* landing ink ramp -> light */
   --ink-950: #ffffff; --ink-900: #f4f6fc; --ink-800: #ffffff; --ink-700: #eef1f8;
   --ink-600: #e6ebf5; --ink-400: #c7d0e4; --ink-200: #aab6d2;
-  /* text -> dark */
-  --text-primary: #0c1020; --text: #0c1020; --t1: #0c1020; --notif-text-primary: #0c1020; --white: #0c1020; --slate-100: #0c1020;
-  --text-secondary: #44506e; --t2: #44506e; --notif-text-secondary: #44506e; --slate-200: #2c3753; --slate-300: #44506e;
-  --text-muted: #6b7799; --t3: #6b7799; --notif-text-muted: #6b7799; --slate-400: #6b7799;
-  --text-subtle: #8793b3; --slate-500: #8793b3;
-  --text-inverse: #ffffff;
-  /* borders */
-  --border: rgba(12, 16, 32, 0.10); --notif-border-color: rgba(12, 16, 32, 0.10);
-  --border-color: rgba(12, 16, 32, 0.12); --border-hover: rgba(12, 16, 32, 0.20);
-  --border-dim: rgba(12, 16, 32, 0.06); --border-subtle: rgba(12, 16, 32, 0.10);
-  --border-bright: rgba(109, 124, 255, 0.40);
-  /* softer shadows on light */
+  --slate-200: #2c3753; --slate-400: #6b7799; --slate-500: #8793b3;
+  --glass:    rgba(15, 23, 42, 0.03);
+  --glass-hv: rgba(15, 23, 42, 0.06);
+  --glass-bd: rgba(15, 23, 42, 0.12);
+
   --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
   --shadow-md: 0 6px 18px rgba(15, 23, 42, 0.10);
   --shadow-lg: 0 16px 40px rgba(15, 23, 42, 0.14);
   --shadow-xl: 0 24px 60px rgba(15, 23, 42, 0.18);
 }
-/* Dial back the dark-mode brand glow on light backgrounds. */
 :root[data-mode="light"] body::before {
   background:
-    radial-gradient(60% 50% at 50% -8%, rgba(109, 124, 255, 0.06), transparent 70%),
-    radial-gradient(45% 40% at 100% 0%, rgba(167, 139, 250, 0.04), transparent 70%);
+    radial-gradient(60% 50% at 50% -8%, rgb(var(--brand-rgb) / 0.06), transparent 70%),
+    radial-gradient(45% 40% at 100% 0%, rgb(var(--brand-2-rgb) / 0.04), transparent 70%);
 }

@@ -1,31 +1,6 @@
-:root {
-  --primary      : #6d7cff;
-  --primary-dark : #5b6af7;
-  --secondary    : #9b6bff;
-  --accent       : #fbbf24;
-  --success      : #34d399;
-  --danger       : #fb7185;
-  --background   : #0b0f1d;
-  --surface      : #11162a;
-  --surface-light: #161d34;
-  --border       : #1d2542;
-  --text         : #eef1fb;
-  --text-muted   : #9aa6cc;
-  --text-subtle  : #5f6a92;
-
-  --brand-primary: #38bdf8;
-  --brand-mid    : #6d7cff;
-  --brand-end    : #9b6bff;
-
-  --ff-display: var(--font-display-google, 'Syne'), system-ui, sans-serif;
-  --ff-body   : var(--font-sans-google, 'DM Sans'), system-ui, sans-serif;
-
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-
-  --transition: 200ms ease;
-}
+/* Design tokens now come from app/styles/theme.css (imported by globals.css).
+   The page-local :root block was removed so Appearance settings — light mode,
+   theme colour, font size, density — reach this screen too. */
 
 * {
   margin: 0;
